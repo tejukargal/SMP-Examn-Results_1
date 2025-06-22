@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diploma Results Management System</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <style>
+        :root {
+            --primary-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --primary-color: #667eea;
+            --text-color: #000000;
+            --text-secondary: #4a5568;
+            --bg-white: rgba(255, 255, 255, 0.95);
+            --border-color: #e2e8f0;
+            --hover-bg: #f7fafc;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --pass-color: #22543d;
+            --fail-color: #742a2a;
+        }
+
+        [data-theme="dark"] {
+            --primary-bg: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+            --primary-color: #667eea;
+            --text-color: #ffffff;
+            --text-secondary: #cbd5e0;
+            --bg-white: rgba(45, 55, 72, 0.95);
+            --border-color: #4a5568;
+            --hover-bg: #2d3748;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --pass-color: #68d391;
+            --fail-color: #fc8181;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--primary-bg);
+            min-height: 100vh;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: var(--bg-white);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid var(--border-color);
+            padding: 20px;
+            box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .sidebar h2 {
+            color: var(--text-color);
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+
+        .file-list {
+            list-style: none;
+        }
+
+        .file-item {
+            padding: 12px 16px;
+            margin: 8px 0;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            color: var(--text-color);
+        }
+
+        .file-item:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateX(5px);
+            border-left-color: var(--primary-color);
+        }
+
+        .file-item.active {
+            background: var(--primary-color);
+            color: white;
+            border-left-color: #4c51bf;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 0 20px 20px 20px;
+            position: relative;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .header {
+            background: var(--bg-white);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 0 0 12px 12px;
+            margin: 0 0 20px 0;
+            box-shadow: var(--shadow);
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            border-bottom: 2px solid var(--border-color);
+            width: 100%;
+        }
+
+        .header h1 {
+            color: var(--text-color);
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            background: #5a67d8;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            background: var(--bg-white);
+            color: var(--text-color);
+            text-transform: uppercase;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .search-btn {
+            padding: 12px 24px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .search-btn:hover {
+            background: #5a67d8;
+        }
+
+        .dashboard {
+            background: var(--bg-white);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .dashboard h2 {
+            color: var(--text-color);
+            font-size: 1.5rem;
+        }
+
+        .toggle-stats {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .toggle-stats:hover {
+            background: #5a67d8;
+        }
+
+        .dashboard-content {
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-content.hidden {
+            display: none;
+        }
+
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            background: var(--bg-white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .stats-table th,
+        .stats-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-color);
+        }
+
+        .stats-table th {
+            background: var(--hover-bg);
+            color: var(--text-color);
+            font-weight: 600;
+        }
+
+        .stats-table tr:hover {
+            background: var(--hover-bg);
+        }
+
+        .chart-container {
+            width: 100%;
+            max-width: 800px;
+            height: 400px;
+            margin: 0 auto;
+        }
+
+        .course-tabs {
+            background: var(--bg-white);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            position: -webkit-sticky;
+            position: sticky;
+            top: 160px;
+            z-index: 150;
+            border: 2px solid var(--border-color);
+            width: 100%;
+        }
+
+        .course-tabs h2 {
+            color: var(--text-color);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .tab-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .tab-button {
+            padding: 20px;
+            background: var(--hover-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-color);
+            font-weight: 600;
+            text-align: center;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-color);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .tab-button:hover::before {
+            transform: scaleX(1);
+        }
+
+        .tab-button:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .tab-button.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .tab-button.active::before {
+            transform: scaleX(1);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .course-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .student-count {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            font-weight: 500;
+        }
+
+        .tab-content {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        #tabContents {
+            min-height: 200px;
+            padding-top: 10px;
+        }
+
+        .student-card {
+            background: var(--bg-white);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            margin-top: 8px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+
+        .student-card:first-child {
+            margin-top: 24px;
+        }
+
+        .student-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .student-card.pass {
+            border-left: 5px solid #48bb78;
+        }
+
+        .student-card.fail {
+            border-left: 5px solid #f56565;
+        }
+
+        .student-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .student-info h4 {
+            color: var(--text-color);
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .student-info p {
+            color: var(--text-color);
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .student-info .reg-no,
+        .student-info .father-name {
+            font-weight: bold;
+        }
+
+        .student-summary {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .summary-item {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .summary-pass {
+            background: rgba(72, 187, 120, 0.2);
+            color: var(--pass-color);
+        }
+
+        .summary-fail {
+            background: rgba(245, 101, 101, 0.2);
+            color: var(--fail-color);
+        }
+
+        .overall-result {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .overall-result.pass {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .overall-result.fail {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 12px;
+        }
+
+        .subjects-table {
+            width: 100%;
+            min-width: 800px;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            table-layout: fixed;
+        }
+
+        .subjects-table th,
+        .subjects-table td {
+            padding: 8px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .subjects-table th {
+            background: var(--hover-bg);
+            color: var(--text-color);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+
+        .subjects-table th:nth-child(1) { width: 60px; }  /* Sem */
+        .subjects-table th:nth-child(2) { width: 100px; } /* QP Code */
+        .subjects-table th:nth-child(3) { width: 250px; } /* Subject */
+        .subjects-table th:nth-child(4) { width: 70px; }  /* IA */
+        .subjects-table th:nth-child(5) { width: 80px; }  /* Theory */
+        .subjects-table th:nth-child(6) { width: 90px; }  /* Practical */
+        .subjects-table th:nth-child(7) { width: 70px; }  /* Result */
+        .subjects-table th:nth-child(8) { width: 70px; }  /* Credit */
+        .subjects-table th:nth-child(9) { width: 70px; }  /* Grade */
+
+        .subjects-table td:nth-child(2),
+        .subjects-table td:nth-child(3) {
+            text-align: left;
+        }
+
+        .result-pass {
+            color: var(--pass-color);
+            font-weight: 600;
+        }
+
+        .result-fail {
+            color: var(--fail-color);
+            font-weight: 600;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: var(--bg-white);
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .modal-header h2 {
+            color: var(--text-color);
+        }
+
+        .close {
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: var(--text-color);
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: var(--primary-color);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-color);
+        }
+
+        .auto-close-notice {
+            background: rgba(102, 126, 234, 0.1);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                order: 2;
+            }
+
+            .main-content {
+                order: 1;
+                padding: 0 15px 15px 15px;
+                height: 100vh;
+                overflow-y: auto;
+            }
+
+            .header {
+                position: -webkit-sticky;
+                position: sticky;
+                top: 0;
+                margin: 0 0 15px 0;
+                border-radius: 0 0 8px 8px;
+                padding: 15px;
+            }
+
+            .course-tabs {
+                position: -webkit-sticky;
+                position: sticky;
+                top: 130px;
+                z-index: 150;
+                margin: 0 0 15px 0;
+                padding: 15px;
+            }
+
+            .dashboard {
+                margin-bottom: 20px;
+            }
+
+            .student-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .tab-buttons {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .tab-button {
+                padding: 15px;
+                text-align: center;
+            }
+
+            .theme-toggle {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+            }
+
+            .subjects-table {
+                font-size: 0.8rem;
+                min-width: 900px;
+            }
+
+            .table-container {
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>Available Results</h2>
+            <ul class="file-list" id="fileList">
+                <li class="loading">Loading files...</li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <button class="theme-toggle" id="themeToggle">🌓</button>
+                <h1 id="pageTitle">Diploma Results Management System</h1>
+                <div class="search-container">
+                    <input type="text" class="search-input" id="searchInput" 
+                           placeholder="Search by Registration Number or Student Name...">
+                    <button class="search-btn" id="searchBtn">Search</button>
+                </div>
+            </div>
+
+            <div class="dashboard" id="dashboard">
+                <div class="dashboard-header">
+                    <h2>Course-wise Statistics</h2>
+                    <button class="toggle-stats" id="toggleStats">Hide Statistics</button>
+                </div>
+                <div class="dashboard-content" id="dashboardContent">
+                    <p class="loading">Please load a results file to view statistics</p>
+                </div>
+            </div>
+
+            <div class="course-tabs" id="courseTabs">
+                <h2>Student Results by Course</h2>
+                <div class="tab-buttons" id="tabButtons"></div>
+            </div>
+
+            <div id="tabContents"></div>
+        </div>
+    </div>
+
+    <!-- Search Results Modal -->
+    <div id="searchModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Search Results</h2>
+                <span class="close" id="closeModal">&times;</span>
+            </div>
+            <div class="auto-close-notice">This window will close automatically in <span id="countdown">10</span> seconds</div>
+            <div id="searchResults"></div>
+        </div>
+    </div>
+
+    <script>
+        class ResultsApp {
+            constructor() {
+                this.resultsData = new Map();
+                this.currentFile = null;
+                this.currentData = [];
+                this.searchTimer = null;
+                this.countdownTimer = null;
+                this.courseNames = {
+                    'CE': 'Civil Engineering',
+                    'CS': 'Computer Science',
+                    'EE': 'Electrical Engineering',
+                    'ME': 'Mechanical Engineering',
+                    'EC': 'Electronics & Communication'
+                };
+                this.isDarkMode = localStorage.getItem('darkMode') === 'true';
+                this.statsVisible = localStorage.getItem('statsVisible') === 'true';
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.applyTheme();
+                this.updateStatsVisibility();
+                this.loadAvailableFiles();
+            }
+
+            setupEventListeners() {
+                document.getElementById('searchBtn').addEventListener('click', () => {
+                    this.performSearch();
+                });
+
+                document.getElementById('searchInput').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.performSearch();
+                    }
+                });
+
+                document.getElementById('searchInput').addEventListener('input', (e) => {
+                    e.target.value = e.target.value.toUpperCase();
+                });
+
+                document.getElementById('themeToggle').addEventListener('click', () => {
+                    this.toggleTheme();
+                });
+
+                document.getElementById('toggleStats').addEventListener('click', () => {
+                    this.toggleStats();
+                });
+
+                document.getElementById('closeModal').addEventListener('click', () => {
+                    this.closeSearchModal();
+                });
+
+                window.addEventListener('click', (e) => {
+                    const modal = document.getElementById('searchModal');
+                    if (e.target === modal) {
+                        this.closeSearchModal();
+                    }
+                });
+            }
+
+            toggleTheme() {
+                this.isDarkMode = !this.isDarkMode;
+                localStorage.setItem('darkMode', this.isDarkMode);
+                this.applyTheme();
+            }
+
+            applyTheme() {
+                document.documentElement.setAttribute('data-theme', this.isDarkMode ? 'dark' : 'light');
+                document.getElementById('themeToggle').textContent = this.isDarkMode ? '☀️' : '🌙';
+            }
+
+            toggleStats() {
+                this.statsVisible = !this.statsVisible;
+                localStorage.setItem('statsVisible', this.statsVisible);
+                this.updateStatsVisibility();
+            }
+
+            updateStatsVisibility() {
+                const content = document.getElementById('dashboardContent');
+                const button = document.getElementById('toggleStats');
+                
+                if (this.statsVisible) {
+                    content.classList.remove('hidden');
+                    button.textContent = 'Hide Statistics';
+                } else {
+                    content.classList.add('hidden');
+                    button.textContent = 'Show Statistics';
+                }
+            }
+
+            closeSearchModal() {
+                document.getElementById('searchModal').style.display = 'none';
+                if (this.searchTimer) {
+                    clearTimeout(this.searchTimer);
+                    this.searchTimer = null;
+                }
+                if (this.countdownTimer) {
+                    clearInterval(this.countdownTimer);
+                    this.countdownTimer = null;
+                }
+            }
+
+            async loadAvailableFiles() {
+                const possibleFiles = [
+                    'Results Nov 2025.csv',
+                    'Results May 2025.csv',
+                    'Results Dec 2024.csv',
+                    'Results June 2024.csv',
+                    'Results April 2024.csv',
+                    'Results October 2023.csv'
+                ];
+
+                let filesLoaded = 0;
+                
+                for (const filename of possibleFiles) {
+                    try {
+                        const response = await fetch(filename);
+                        if (response.ok) {
+                            const csvText = await response.text();
+                            this.parseCSVFile(filename, csvText);
+                            filesLoaded++;
+                        }
+                    } catch (error) {
+                        console.log(`File ${filename} not found`);
+                    }
+                }
+
+                if (filesLoaded === 0) {
+                    document.getElementById('fileList').innerHTML = '<li class="loading">No result files found in the directory.</li>';
+                }
+            }
+
+            parseCSVFile(filename, csvText) {
+                Papa.parse(csvText, {
+                    header: true,
+                    dynamicTyping: true,
+                    skipEmptyLines: true,
+                    complete: (results) => {
+                        this.resultsData.set(filename, results.data);
+                        this.updateFileList();
+                        if (!this.currentFile) {
+                            this.loadFile(filename);
+                        }
+                    }
+                });
+            }
+
+            updateFileList() {
+                const fileList = document.getElementById('fileList');
+                fileList.innerHTML = '';
+
+                for (const [filename] of this.resultsData) {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'file-item';
+                    if (filename === this.currentFile) {
+                        listItem.classList.add('active');
+                    }
+                    listItem.textContent = this.extractTitleFromFilename(filename);
+                    listItem.addEventListener('click', () => this.loadFile(filename));
+                    fileList.appendChild(listItem);
+                }
+            }
+
+            extractTitleFromFilename(filename) {
+                const match = filename.match(/Results\s+(.+?)\.csv/i);
+                return match ? `Results ${match[1]}` : filename.replace('.csv', '');
+            }
+
+            loadFile(filename) {
+                this.currentFile = filename;
+                this.currentData = this.resultsData.get(filename) || [];
+                
+                document.getElementById('pageTitle').textContent = this.extractTitleFromFilename(filename);
+                this.updateFileList();
+                this.generateDashboard();
+                this.generateCourseTabs();
+            }
+
+            generateDashboard() {
+                const courseStats = this.calculateCourseStats();
+                const dashboardContent = document.getElementById('dashboardContent');
+
+                let html = `
+                    <table class="stats-table">
+                        <thead>
+                            <tr>
+                                <th>Course</th>
+                                <th>Total Students</th>
+                                <th>Passed</th>
+                                <th>Failed</th>
+                                <th>First Class</th>
+                                <th>Distinction</th>
+                                <th>Pass %</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                for (const [course, stats] of courseStats) {
+                    const passPercentage = ((stats.passed / stats.total) * 100).toFixed(1);
+                    html += `
+                        <tr>
+                            <td><strong>${this.courseNames[course] || course}</strong></td>
+                            <td>${stats.total}</td>
+                            <td style="color: var(--pass-color);">${stats.passed}</td>
+                            <td style="color: var(--fail-color);">${stats.failed}</td>
+                            <td style="color: #2b6cb0;">${stats.firstClass}</td>
+                            <td style="color: #805ad5;">${stats.distinction}</td>
+                            <td><strong>${passPercentage}%</strong></td>
+                        </tr>
+                    `;
+                }
+
+                html += `
+                        </tbody>
+                    </table>
+                    <div class="chart-container">
+                        <canvas id="statsChart"></canvas>
+                    </div>
+                `;
+
+                dashboardContent.innerHTML = html;
+                
+                // Only create chart if stats are visible
+                if (this.statsVisible) {
+                    this.createChart(courseStats);
+                }
+            }
+
+            calculateCourseStats() {
+                const courseStats = new Map();
+                const studentsByRegNo = this.groupByRegNo();
+
+                for (const [regNo, studentData] of studentsByRegNo) {
+                    const course = studentData[0].Course_Code;
+                    const overallResult = studentData[0].Overall_Result;
+
+                    if (!courseStats.has(course)) {
+                        courseStats.set(course, {
+                            total: 0,
+                            passed: 0,
+                            failed: 0,
+                            firstClass: 0,
+                            distinction: 0
+                        });
+                    }
+
+                    const stats = courseStats.get(course);
+                    stats.total++;
+
+                    if (overallResult === 'FAILS') {
+                        stats.failed++;
+                    } else {
+                        stats.passed++;
+                        if (overallResult.includes('First Class')) {
+                            stats.firstClass++;
+                        }
+                        if (overallResult.includes('Distinction')) {
+                            stats.distinction++;
+                        }
+                    }
+                }
+
+                return courseStats;
+            }
+
+            createChart(courseStats) {
+                const ctx = document.getElementById('statsChart').getContext('2d');
+                
+                const courses = Array.from(courseStats.keys()).map(course => this.courseNames[course] || course);
+                const passedData = Array.from(courseStats.values()).map(stats => stats.passed);
+                const failedData = Array.from(courseStats.values()).map(stats => stats.failed);
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: courses,
+                        datasets: [
+                            {
+                                label: 'Passed',
+                                data: passedData,
+                                backgroundColor: 'rgba(72, 187, 120, 0.8)',
+                                borderColor: 'rgba(72, 187, 120, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Failed',
+                                data: failedData,
+                                backgroundColor: 'rgba(245, 101, 101, 0.8)',
+                                borderColor: 'rgba(245, 101, 101, 1)',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Number of Students'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Courses'
+                                }
+                            }
+                        },
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Course-wise Pass/Fail Statistics'
+                            },
+                            legend: {
+                                display: true
+                            }
+                        }
+                    }
+                });
+            }
+
+            groupByRegNo() {
+                const grouped = new Map();
+                this.currentData.forEach(row => {
+                    const regNo = row.Reg_No;
+                    if (!grouped.has(regNo)) {
+                        grouped.set(regNo, []);
+                    }
+                    grouped.get(regNo).push(row);
+                });
+                return grouped;
+            }
+
+            generateCourseTabs() {
+                const studentsByRegNo = this.groupByRegNo();
+                const studentsByCourse = new Map();
+
+                // Group students by course
+                for (const [regNo, studentData] of studentsByRegNo) {
+                    const course = studentData[0].Course_Code;
+                    if (!studentsByCourse.has(course)) {
+                        studentsByCourse.set(course, []);
+                    }
+                    studentsByCourse.get(course).push({ regNo, data: studentData });
+                }
+
+                // Generate tab buttons
+                const tabButtons = document.getElementById('tabButtons');
+                const tabContents = document.getElementById('tabContents');
+                
+                tabButtons.innerHTML = '';
+                tabContents.innerHTML = '';
+
+                let isFirst = true;
+                for (const [course, students] of studentsByCourse) {
+                    // Create tab button
+                    const tabButton = document.createElement('div');
+                    tabButton.className = `tab-button ${isFirst ? 'active' : ''}`;
+                    tabButton.innerHTML = `
+                        <div class="course-name">${this.courseNames[course] || course}</div>
+                        <div class="student-count">${students.length} Students</div>
+                    `;
+                    tabButton.addEventListener('click', () => this.switchTab(course));
+                    tabButtons.appendChild(tabButton);
+
+                    // Create tab content
+                    const tabContent = document.createElement('div');
+                    tabContent.className = `tab-content ${isFirst ? 'active' : ''}`;
+                    tabContent.id = `tab-${course}`;
+                    tabContent.innerHTML = students.map(student => 
+                        this.generateStudentCard(student.regNo, student.data)
+                    ).join('');
+                    tabContents.appendChild(tabContent);
+
+                    isFirst = false;
+                }
+            }
+
+            switchTab(courseCode) {
+                // Remove active class from all buttons and contents
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+                // Add active class to clicked button and corresponding content
+                event.target.classList.add('active');
+                document.getElementById(`tab-${courseCode}`).classList.add('active');
+            }
+
+            calculateStudentSummary(studentData) {
+                let passed = 0;
+                let failed = 0;
+                
+                studentData.forEach(subject => {
+                    if (subject.Result === 'P') {
+                        passed++;
+                    } else {
+                        failed++;
+                    }
+                });
+
+                return { passed, failed };
+            }
+
+            generateStudentCard(regNo, studentData) {
+                const firstRecord = studentData[0];
+                const overallResult = firstRecord.Overall_Result;
+                const isPassed = overallResult !== 'FAILS';
+                const summary = this.calculateStudentSummary(studentData);
+
+                return `
+                    <div class="student-card ${isPassed ? 'pass' : 'fail'}">
+                        <div class="student-header">
+                            <div class="student-info">
+                                <h4>${firstRecord.Student_Name}</h4>
+                                <p><span class="reg-no">Reg No: ${regNo}</span> | <span class="father-name">Father: ${firstRecord.Father_Name}</span></p>
+                            </div>
+                            <div class="student-summary">
+                                <div class="summary-item summary-pass">Passed: ${summary.passed}</div>
+                                <div class="summary-item summary-fail">Failed: ${summary.failed}</div>
+                                <div class="overall-result ${isPassed ? 'pass' : 'fail'}">
+                                    ${overallResult}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <table class="subjects-table">
+                                <thead>
+                                    <tr>
+                                        <th>Sem</th>
+                                        <th>QP Code</th>
+                                        <th>Subject</th>
+                                        <th>IA</th>
+                                        <th>Theory</th>
+                                        <th>Practical</th>
+                                        <th>Result</th>
+                                        <th>Credit</th>
+                                        <th>Grade</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${studentData.map(subject => `
+                                        <tr>
+                                            <td>${subject.Semester}</td>
+                                            <td>${subject.QP_Code ? subject.QP_Code.replace(':', '') : '--'}</td>
+                                            <td>${subject.Subject_Name}</td>
+                                            <td>${subject.IA || '--'}</td>
+                                            <td>${subject.Tr || '--'}</td>
+                                            <td>${subject.Pr || '--'}</td>
+                                            <td class="${subject.Result === 'P' ? 'result-pass' : 'result-fail'}">${subject.Result}</td>
+                                            <td>${subject.Credit}</td>
+                                            <td>${subject.Grade}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            }
+
+            performSearch() {
+                const searchTerm = document.getElementById('searchInput').value.trim();
+                if (!searchTerm) return;
+
+                const studentsByRegNo = this.groupByRegNo();
+                const searchResults = [];
+
+                for (const [regNo, studentData] of studentsByRegNo) {
+                    const student = studentData[0];
+                    if (regNo.toUpperCase().includes(searchTerm) || 
+                        student.Student_Name.toUpperCase().includes(searchTerm)) {
+                        searchResults.push({ regNo, data: studentData });
+                    }
+                }
+
+                this.displaySearchResults(searchResults, searchTerm);
+            }
+
+            displaySearchResults(results, searchTerm) {
+                const modal = document.getElementById('searchModal');
+                const searchResults = document.getElementById('searchResults');
+
+                if (results.length === 0) {
+                    searchResults.innerHTML = `<p>No results found for "${searchTerm}"</p>`;
+                } else {
+                    searchResults.innerHTML = `
+                        <p><strong>${results.length} result(s) found for "${searchTerm}":</strong></p>
+                        ${results.map(student => this.generateStudentCard(student.regNo, student.data)).join('')}
+                    `;
+                }
+
+                modal.style.display = 'block';
+                this.startAutoCloseTimer();
+            }
+
+            startAutoCloseTimer() {
+                let countdown = 10;
+                const countdownElement = document.getElementById('countdown');
+                
+                // Clear any existing timers
+                if (this.searchTimer) clearTimeout(this.searchTimer);
+                if (this.countdownTimer) clearInterval(this.countdownTimer);
+
+                // Update countdown every second
+                this.countdownTimer = setInterval(() => {
+                    countdown--;
+                    countdownElement.textContent = countdown;
+                    
+                    if (countdown <= 0) {
+                        clearInterval(this.countdownTimer);
+                        this.closeSearchModal();
+                    }
+                }, 1000);
+
+                // Set main timer
+                this.searchTimer = setTimeout(() => {
+                    this.closeSearchModal();
+                }, 10000);
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            new ResultsApp();
+        });
+    </script>
+</body>
+</html>

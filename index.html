@@ -3,34 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diploma Results Management System</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <title>Enhanced Diploma Results Management System</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         :root {
             --primary-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             --primary-color: #667eea;
-            --text-color: #000000;
-            --text-secondary: #4a5568;
+            --secondary-color: #764ba2;
+            --accent-color: #4f46e5;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --text-color: #1f2937;
+            --text-secondary: #6b7280;
+            --text-light: #9ca3af;
             --bg-white: rgba(255, 255, 255, 0.95);
-            --border-color: #e2e8f0;
-            --hover-bg: #f7fafc;
+            --bg-glass: rgba(255, 255, 255, 0.1);
+            --border-color: #e5e7eb;
+            --hover-bg: #f9fafb;
             --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            --pass-color: #22543d;
-            --fail-color: #742a2a;
+            --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.15);
+            --pass-color: #065f46;
+            --fail-color: #991b1b;
+            --border-radius: 12px;
+            --border-radius-lg: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         [data-theme="dark"] {
-            --primary-bg: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
-            --primary-color: #667eea;
-            --text-color: #ffffff;
+            --primary-bg: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            --primary-color: #818cf8;
+            --secondary-color: #a78bfa;
+            --accent-color: #6366f1;
+            --text-color: #f8fafc;
             --text-secondary: #cbd5e0;
-            --bg-white: rgba(45, 55, 72, 0.95);
-            --border-color: #4a5568;
-            --hover-bg: #2d3748;
+            --text-light: #94a3b8;
+            --bg-white: rgba(30, 41, 59, 0.95);
+            --bg-glass: rgba(255, 255, 255, 0.05);
+            --border-color: #475569;
+            --hover-bg: #334155;
             --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            --pass-color: #68d391;
-            --fail-color: #fc8181;
+            --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.4);
+            --pass-color: #34d399;
+            --fail-color: #fca5a5;
         }
 
         * {
@@ -40,34 +57,104 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--primary-bg);
             min-height: 100vh;
             color: var(--text-color);
-            transition: all 0.3s ease;
+            transition: var(--transition);
+            overflow-x: hidden;
         }
 
         .container {
             display: flex;
             min-height: 100vh;
+            position: relative;
+        }
+
+        /* Enhanced Mobile Menu */
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 18px;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+        }
+
+        .mobile-menu-toggle:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 800;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .mobile-overlay.active {
+            display: block;
+            opacity: 1;
         }
 
         .sidebar {
-            width: 250px;
+            width: 280px;
             background: var(--bg-white);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(20px);
             border-right: 1px solid var(--border-color);
-            padding: 20px;
-            box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+            z-index: 900;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--primary-color);
         }
 
         .sidebar h2 {
             color: var(--text-color);
-            margin-bottom: 20px;
-            font-size: 1.2rem;
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .close-sidebar {
+            display: none;
+            background: var(--bg-glass);
+            border: none;
+            border-radius: 8px;
+            padding: 8px;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .close-sidebar:hover {
+            background: var(--hover-bg);
         }
 
         .file-list {
@@ -75,239 +162,391 @@
         }
 
         .file-item {
-            padding: 12px 16px;
+            padding: 16px 20px;
             margin: 8px 0;
-            background: rgba(102, 126, 234, 0.1);
-            border-radius: 8px;
+            background: var(--bg-glass);
+            border-radius: var(--border-radius);
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition);
             border-left: 4px solid transparent;
             color: var(--text-color);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            opacity: 0;
+            transition: var(--transition);
+            z-index: -1;
         }
 
         .file-item:hover {
-            background: rgba(102, 126, 234, 0.2);
-            transform: translateX(5px);
+            transform: translateX(8px) translateY(-2px);
             border-left-color: var(--primary-color);
+            box-shadow: var(--shadow);
+        }
+
+        .file-item:hover::before {
+            opacity: 0.1;
         }
 
         .file-item.active {
             background: var(--primary-color);
             color: white;
-            border-left-color: #4c51bf;
+            border-left-color: var(--secondary-color);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .file-item.active::before {
+            opacity: 0.2;
         }
 
         .main-content {
             flex: 1;
-            padding: 0 20px 20px 20px;
+            padding: 0 24px 24px 24px;
             position: relative;
             height: 100vh;
             overflow-y: auto;
+            scroll-behavior: smooth;
         }
 
+        /* Enhanced Header */
         .header {
             background: var(--bg-white);
-            backdrop-filter: blur(10px);
-            padding: 20px;
-            border-radius: 0 0 12px 12px;
-            margin: 0 0 20px 0;
+            backdrop-filter: blur(20px);
+            padding: 24px;
+            border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+            margin: 0 0 24px 0;
             box-shadow: var(--shadow);
-            position: -webkit-sticky;
             position: sticky;
             top: 0;
-            z-index: 200;
-            border-bottom: 2px solid var(--border-color);
-            width: 100%;
+            z-index: 100;
+            border-bottom: 1px solid var(--border-color);
         }
 
-        .header h1 {
-            color: var(--text-color);
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
-
-        .theme-toggle {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 45px;
-            height: 45px;
-            cursor: pointer;
-            font-size: 1.2rem;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .theme-toggle:hover {
-            transform: scale(1.1);
-            background: #5a67d8;
-        }
-
-        .search-container {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin-top: 15px;
-        }
-
-        .search-input {
-            flex: 1;
-            padding: 12px 16px;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-            background: var(--bg-white);
-            color: var(--text-color);
-            text-transform: uppercase;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-
-        .search-btn {
-            padding: 12px 24px;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.3s ease;
-        }
-
-        .search-btn:hover {
-            background: #5a67d8;
-        }
-
-        .dashboard {
-            background: var(--bg-white);
-            backdrop-filter: blur(10px);
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow);
-        }
-
-        .dashboard-header {
+        .header-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
         }
 
-        .dashboard h2 {
+        .header h1 {
             color: var(--text-color);
-            font-size: 1.5rem;
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .toggle-stats {
+        .header-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            background: var(--bg-glass);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            width: 48px;
+            height: 48px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.05);
+            background: var(--primary-color);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .export-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .export-btn {
+            padding: 10px 16px;
+            background: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .export-btn.pdf {
+            background: var(--error-color);
+        }
+
+        /* Enhanced Search */
+        .search-container {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-wrapper {
+            display: flex;
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 14px 50px 14px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+            background: var(--bg-white);
+            color: var(--text-color);
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 18px;
+            padding: 4px;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .search-clear:hover {
+            color: var(--text-color);
+            background: var(--hover-bg);
+        }
+
+        .search-btn {
+            padding: 14px 24px;
             background: var(--primary-color);
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
+            border-radius: var(--border-radius);
             cursor: pointer;
-            font-size: 0.9rem;
-            transition: background-color 0.3s ease;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-btn:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .search-filters {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-white);
+            color: var(--text-color);
+            font-size: 0.875rem;
+            transition: var(--transition);
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        /* Enhanced Dashboard */
+        .dashboard {
+            background: var(--bg-white);
+            backdrop-filter: blur(20px);
+            padding: 24px;
+            border-radius: var(--border-radius-lg);
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .dashboard h2 {
+            color: var(--text-color);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .toggle-stats {
+            background: var(--bg-glass);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
         }
 
         .toggle-stats:hover {
-            background: #5a67d8;
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
         }
 
         .dashboard-content {
-            transition: all 0.3s ease;
+            transition: var(--transition);
         }
 
         .dashboard-content.hidden {
             display: none;
         }
 
+        /* Enhanced Statistics Table */
         .stats-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 30px;
             background: var(--bg-white);
-            border-radius: 8px;
+            border-radius: var(--border-radius);
             overflow: hidden;
             box-shadow: var(--shadow);
         }
 
         .stats-table th,
         .stats-table td {
-            padding: 12px;
+            padding: 16px 12px;
             text-align: left;
             border-bottom: 1px solid var(--border-color);
             color: var(--text-color);
+            transition: var(--transition);
         }
 
         .stats-table th {
-            background: var(--hover-bg);
+            background: var(--bg-glass);
             color: var(--text-color);
-            font-weight: 600;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 0.5px;
         }
 
         .stats-table tr:hover {
             background: var(--hover-bg);
+            transform: scale(1.01);
         }
 
+        .stats-table td:first-child {
+            font-weight: 600;
+        }
+
+        /* Enhanced Chart */
         .chart-container {
             width: 100%;
-            max-width: 800px;
-            height: 400px;
+            max-width: 100%;
+            height: 450px;
             margin: 0 auto;
+            background: var(--bg-glass);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            backdrop-filter: blur(10px);
         }
 
+        /* Enhanced Course Tabs */
         .course-tabs {
             background: var(--bg-white);
-            backdrop-filter: blur(10px);
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
+            backdrop-filter: blur(20px);
+            padding: 24px;
+            border-radius: var(--border-radius-lg);
+            margin-bottom: 24px;
             box-shadow: var(--shadow);
-            position: -webkit-sticky;
             position: sticky;
-            top: 160px;
-            z-index: 150;
-            border: 2px solid var(--border-color);
-            width: 100%;
+            top: 180px;
+            z-index: 90;
+            border: 1px solid var(--border-color);
         }
 
         .course-tabs h2 {
             color: var(--text-color);
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             font-size: 1.5rem;
+            font-weight: 700;
         }
 
         .tab-buttons {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
         }
 
         .tab-button {
-            padding: 20px;
-            background: var(--hover-bg);
+            padding: 24px;
+            background: var(--bg-glass);
             border: 2px solid var(--border-color);
-            border-radius: 12px;
+            border-radius: var(--border-radius);
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition);
             color: var(--text-color);
             font-weight: 600;
             text-align: center;
             box-shadow: var(--shadow);
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(10px);
         }
 
         .tab-button::before {
@@ -315,11 +554,11 @@
             position: absolute;
             top: 0;
             left: 0;
-            right: 0;
+            width: 100%;
             height: 4px;
-            background: var(--primary-color);
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
             transform: scaleX(0);
-            transition: transform 0.3s ease;
+            transition: var(--transition);
         }
 
         .tab-button:hover::before {
@@ -327,18 +566,18 @@
         }
 
         .tab-button:hover {
-            background: rgba(102, 126, 234, 0.1);
+            background: var(--bg-glass);
             border-color: var(--primary-color);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
         }
 
         .tab-button.active {
-            background: var(--primary-color);
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
             color: white;
             border-color: var(--primary-color);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.3);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
         }
 
         .tab-button.active::before {
@@ -347,183 +586,220 @@
         }
 
         .course-name {
-            font-size: 1.1rem;
+            font-size: 1.125rem;
             font-weight: 700;
             margin-bottom: 8px;
         }
 
         .student-count {
-            font-size: 0.9rem;
-            opacity: 0.8;
+            font-size: 0.875rem;
+            opacity: 0.9;
             font-weight: 500;
         }
 
         .tab-content {
             display: none;
-            margin-top: 20px;
+            animation: fadeIn 0.3s ease;
         }
 
         .tab-content.active {
             display: block;
         }
 
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         #tabContents {
             min-height: 200px;
-            padding-top: 10px;
+            padding-top: 16px;
         }
 
+        /* Enhanced Student Cards */
         .student-card {
             background: var(--bg-white);
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 16px;
-            margin-top: 8px;
+            border-radius: var(--border-radius-lg);
+            padding: 24px;
+            margin-bottom: 20px;
             box-shadow: var(--shadow);
-            transition: transform 0.3s ease;
+            transition: var(--transition);
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
         }
 
-        .student-card:first-child {
-            margin-top: 24px;
+        .student-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .student-card:hover::before {
+            transform: translateX(100%);
         }
 
         .student-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
         }
 
         .student-card.pass {
-            border-left: 5px solid #48bb78;
+            border-left: 6px solid var(--success-color);
         }
 
         .student-card.fail {
-            border-left: 5px solid #f56565;
+            border-left: 6px solid var(--error-color);
         }
 
         .student-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
+            align-items: flex-start;
+            margin-bottom: 20px;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 16px;
         }
 
         .student-info h4 {
             color: var(--text-color);
-            font-size: 1.1rem;
-            font-weight: bold;
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 8px;
         }
 
         .student-info p {
-            color: var(--text-color);
-            font-size: 0.9rem;
-            margin-top: 4px;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 4px;
         }
 
         .student-info .reg-no,
         .student-info .father-name {
-            font-weight: bold;
+            font-weight: 600;
+            color: var(--text-color);
         }
 
         .student-summary {
             display: flex;
-            gap: 15px;
+            gap: 12px;
             align-items: center;
             flex-wrap: wrap;
         }
 
         .summary-item {
-            background: rgba(102, 126, 234, 0.1);
-            padding: 6px 12px;
-            border-radius: 15px;
-            font-size: 0.8rem;
+            background: var(--bg-glass);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.875rem;
             font-weight: 600;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
         }
 
         .summary-pass {
-            background: rgba(72, 187, 120, 0.2);
-            color: var(--pass-color);
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+            border-color: var(--success-color);
         }
 
         .summary-fail {
-            background: rgba(245, 101, 101, 0.2);
-            color: var(--fail-color);
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error-color);
+            border-color: var(--error-color);
         }
 
         .overall-result {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 0.875rem;
+            font-weight: 700;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .overall-result.pass {
-            background: #c6f6d5;
-            color: #22543d;
+            background: linear-gradient(45deg, var(--success-color), #059669);
+            color: white;
         }
 
         .overall-result.fail {
-            background: #fed7d7;
-            color: #742a2a;
+            background: linear-gradient(45deg, var(--error-color), #dc2626);
+            color: white;
         }
 
+        /* Enhanced Subjects Table */
         .table-container {
             overflow-x: auto;
-            margin-top: 12px;
+            margin-top: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
         }
 
         .subjects-table {
             width: 100%;
-            min-width: 800px;
+            min-width: 900px;
             border-collapse: collapse;
-            font-size: 0.9rem;
-            table-layout: fixed;
+            font-size: 0.875rem;
+            background: var(--bg-white);
         }
 
         .subjects-table th,
         .subjects-table td {
-            padding: 8px;
+            padding: 12px 8px;
             text-align: center;
             border: 1px solid var(--border-color);
             color: var(--text-color);
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
         .subjects-table th {
-            background: var(--hover-bg);
+            background: var(--bg-glass);
             color: var(--text-color);
-            font-weight: 600;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
             position: sticky;
             top: 0;
+            backdrop-filter: blur(10px);
         }
-
-        .subjects-table th:nth-child(1) { width: 60px; }  /* Sem */
-        .subjects-table th:nth-child(2) { width: 100px; } /* QP Code */
-        .subjects-table th:nth-child(3) { width: 250px; } /* Subject */
-        .subjects-table th:nth-child(4) { width: 70px; }  /* IA */
-        .subjects-table th:nth-child(5) { width: 80px; }  /* Theory */
-        .subjects-table th:nth-child(6) { width: 90px; }  /* Practical */
-        .subjects-table th:nth-child(7) { width: 70px; }  /* Result */
-        .subjects-table th:nth-child(8) { width: 70px; }  /* Credit */
-        .subjects-table th:nth-child(9) { width: 70px; }  /* Grade */
 
         .subjects-table td:nth-child(2),
         .subjects-table td:nth-child(3) {
             text-align: left;
         }
 
+        .subjects-table tr:nth-child(even) {
+            background: var(--hover-bg);
+        }
+
+        .subjects-table tr:hover {
+            background: var(--bg-glass);
+        }
+
         .result-pass {
-            color: var(--pass-color);
-            font-weight: 600;
+            color: var(--success-color);
+            font-weight: 700;
         }
 
         .result-fail {
-            color: var(--fail-color);
-            font-weight: 600;
+            color: var(--error-color);
+            font-weight: 700;
         }
 
+        /* Enhanced Modal */
         .modal {
             display: none;
             position: fixed;
@@ -532,167 +808,334 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            animation: modalFadeIn 0.3s ease;
         }
 
         .modal-content {
             background: var(--bg-white);
-            margin: 5% auto;
-            padding: 20px;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 800px;
-            max-height: 80vh;
+            margin: 3% auto;
+            padding: 32px;
+            border-radius: var(--border-radius-lg);
+            width: 95%;
+            max-width: 900px;
+            max-height: 85vh;
             overflow-y: auto;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
             border-bottom: 2px solid var(--border-color);
         }
 
         .modal-header h2 {
             color: var(--text-color);
+            font-weight: 700;
         }
 
         .close {
             font-size: 28px;
             font-weight: bold;
             cursor: pointer;
-            color: var(--text-color);
-            transition: color 0.3s ease;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            padding: 4px 8px;
+            border-radius: 8px;
         }
 
         .close:hover {
-            color: var(--primary-color);
+            color: var(--error-color);
+            background: var(--hover-bg);
         }
 
         .loading {
             text-align: center;
             padding: 40px;
-            color: var(--text-color);
+            color: var(--text-secondary);
+            font-size: 1.125rem;
         }
 
         .auto-close-notice {
-            background: rgba(102, 126, 234, 0.1);
-            color: var(--text-color);
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            margin-bottom: 15px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 12px 20px;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            margin-bottom: 20px;
             text-align: center;
+            font-weight: 600;
         }
 
+        /* Loading States */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Enhanced Mobile Styles */
         @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
+            .mobile-menu-toggle {
+                display: block;
             }
 
             .sidebar {
-                width: 100%;
-                order: 2;
+                position: fixed;
+                top: 0;
+                left: -300px;
+                height: 100vh;
+                z-index: 900;
+                transition: left 0.3s ease;
+                width: 280px;
+            }
+
+            .sidebar.mobile-open {
+                left: 0;
+            }
+
+            .close-sidebar {
+                display: block;
             }
 
             .main-content {
-                order: 1;
-                padding: 0 15px 15px 15px;
-                height: 100vh;
-                overflow-y: auto;
+                width: 100%;
+                padding: 70px 16px 16px 16px;
             }
 
             .header {
-                position: -webkit-sticky;
-                position: sticky;
-                top: 0;
-                margin: 0 0 15px 0;
-                border-radius: 0 0 8px 8px;
-                padding: 15px;
+                padding: 20px 16px;
+                margin: 0 0 16px 0;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .header-top {
+                flex-direction: column;
+                gap: 16px;
+                align-items: stretch;
+            }
+
+            .header-controls {
+                justify-content: space-between;
+            }
+
+            .search-wrapper {
+                min-width: 100%;
+            }
+
+            .search-container {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .search-filters {
+                margin-top: 12px;
+                justify-content: space-between;
+            }
+
+            .filter-select {
+                flex: 1;
+                min-width: 0;
             }
 
             .course-tabs {
-                position: -webkit-sticky;
-                position: sticky;
-                top: 130px;
-                z-index: 150;
-                margin: 0 0 15px 0;
-                padding: 15px;
-            }
-
-            .dashboard {
-                margin-bottom: 20px;
-            }
-
-            .student-header {
-                flex-direction: column;
-                align-items: flex-start;
+                top: 160px;
+                padding: 16px;
+                margin-bottom: 16px;
             }
 
             .tab-buttons {
                 grid-template-columns: 1fr;
-                gap: 10px;
+                gap: 12px;
             }
 
             .tab-button {
-                padding: 15px;
-                text-align: center;
+                padding: 16px;
             }
 
-            .theme-toggle {
-                position: absolute;
-                top: 20px;
-                right: 20px;
+            .student-card {
+                padding: 16px;
+                margin-bottom: 16px;
+            }
+
+            .student-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+
+            .student-summary {
+                justify-content: space-between;
             }
 
             .subjects-table {
-                font-size: 0.8rem;
-                min-width: 900px;
+                font-size: 0.75rem;
+                min-width: 800px;
             }
 
-            .table-container {
-                border-radius: 8px;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            .subjects-table th,
+            .subjects-table td {
+                padding: 8px 4px;
             }
+
+            .modal-content {
+                margin: 10% auto;
+                padding: 20px;
+                width: 95%;
+            }
+
+            .dashboard {
+                padding: 16px;
+                margin-bottom: 16px;
+            }
+
+            .chart-container {
+                height: 300px;
+                padding: 16px;
+            }
+
+            .export-controls {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .export-btn {
+                justify-content: center;
+            }
+        }
+
+        /* Accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Focus states for keyboard navigation */
+        .tab-button:focus,
+        .file-item:focus,
+        .search-btn:focus,
+        .theme-toggle:focus {
+            outline: 3px solid var(--primary-color);
+            outline-offset: 2px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="sidebar">
-            <h2>Available Results</h2>
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-menu-toggle" onclick="app.toggleMobileMenu()" aria-label="Toggle Menu">
+            ☰
+        </button>
+
+        <!-- Mobile Overlay -->
+        <div class="mobile-overlay" onclick="app.closeMobileMenu()"></div>
+
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>📁 Available Results</h2>
+                <button class="close-sidebar" onclick="app.closeMobileMenu()" aria-label="Close Menu">✕</button>
+            </div>
             <ul class="file-list" id="fileList">
-                <li class="loading">Loading files...</li>
+                <li class="loading">🔄 Loading files...</li>
             </ul>
         </div>
 
         <div class="main-content">
             <div class="header">
-                <button class="theme-toggle" id="themeToggle">🌓</button>
-                <h1 id="pageTitle">Diploma Results Management System</h1>
+                <div class="header-top">
+                    <h1 id="pageTitle">🎓 Enhanced Diploma Results System</h1>
+                    <div class="header-controls">
+                        <div class="export-controls">
+                            <button class="export-btn" onclick="app.exportToCSV()" title="Export to CSV">
+                                📊 CSV
+                            </button>
+                            <button class="export-btn pdf" onclick="app.exportToPDF()" title="Export to PDF">
+                                📄 PDF
+                            </button>
+                        </div>
+                        <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">🌓</button>
+                    </div>
+                </div>
+                
                 <div class="search-container">
-                    <input type="text" class="search-input" id="searchInput" 
-                           placeholder="Search by Registration Number or Student Name...">
-                    <button class="search-btn" id="searchBtn">Search</button>
+                    <div class="search-wrapper">
+                        <input type="text" class="search-input" id="searchInput" 
+                               placeholder="🔍 Search by Registration Number or Student Name..."
+                               autocomplete="off">
+                        <button class="search-clear" id="searchClear" title="Clear search">✕</button>
+                    </div>
+                    <button class="search-btn" id="searchBtn">
+                        <span class="loading-spinner" id="searchSpinner" style="display: none;"></span>
+                        Search
+                    </button>
+                </div>
+
+                <div class="search-filters">
+                    <select class="filter-select" id="courseFilter">
+                        <option value="">All Courses</option>
+                    </select>
+                    <select class="filter-select" id="resultFilter">
+                        <option value="">All Results</option>
+                        <option value="pass">Pass Only</option>
+                        <option value="fail">Fail Only</option>
+                        <option value="distinction">Distinction Only</option>
+                        <option value="first">First Class Only</option>
+                    </select>
+                    <select class="filter-select" id="semesterFilter">
+                        <option value="">All Semesters</option>
+                    </select>
                 </div>
             </div>
 
             <div class="dashboard" id="dashboard">
                 <div class="dashboard-header">
-                    <h2>Course-wise Statistics</h2>
+                    <h2>📊 Course-wise Statistics</h2>
                     <button class="toggle-stats" id="toggleStats">Hide Statistics</button>
                 </div>
                 <div class="dashboard-content" id="dashboardContent">
-                    <p class="loading">Please load a results file to view statistics</p>
+                    <p class="loading">📂 Please load a results file to view statistics</p>
                 </div>
             </div>
 
             <div class="course-tabs" id="courseTabs">
-                <h2>Student Results by Course</h2>
+                <h2>👥 Student Results by Course</h2>
                 <div class="tab-buttons" id="tabButtons"></div>
             </div>
 
@@ -700,35 +1143,39 @@
         </div>
     </div>
 
-    <!-- Search Results Modal -->
+    <!-- Enhanced Search Results Modal -->
     <div id="searchModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Search Results</h2>
+                <h2>🔍 Search Results</h2>
                 <span class="close" id="closeModal">&times;</span>
             </div>
-            <div class="auto-close-notice">This window will close automatically in <span id="countdown">10</span> seconds</div>
+            <div class="auto-close-notice">
+                ⏱️ This window will close automatically in <span id="countdown">15</span> seconds
+            </div>
             <div id="searchResults"></div>
         </div>
     </div>
 
     <script>
-        class ResultsApp {
+        class EnhancedResultsApp {
             constructor() {
                 this.resultsData = new Map();
                 this.currentFile = null;
                 this.currentData = [];
+                this.filteredData = [];
                 this.searchTimer = null;
                 this.countdownTimer = null;
                 this.courseNames = {
                     'CE': 'Civil Engineering',
-                    'CS': 'Computer Science',
+                    'CS': 'Computer Science Engineering',
                     'EE': 'Electrical Engineering',
                     'ME': 'Mechanical Engineering',
-                    'EC': 'Electronics & Communication'
+                    'EC': 'Electronics & Communication Engineering'
                 };
                 this.isDarkMode = localStorage.getItem('darkMode') === 'true';
-                this.statsVisible = localStorage.getItem('statsVisible') === 'true';
+                this.statsVisible = localStorage.getItem('statsVisible') !== 'false';
+                this.mobileMenuOpen = false;
                 this.init();
             }
 
@@ -737,9 +1184,11 @@
                 this.applyTheme();
                 this.updateStatsVisibility();
                 this.loadAvailableFiles();
+                this.setupRealTimeSearch();
             }
 
             setupEventListeners() {
+                // Search functionality
                 document.getElementById('searchBtn').addEventListener('click', () => {
                     this.performSearch();
                 });
@@ -752,8 +1201,27 @@
 
                 document.getElementById('searchInput').addEventListener('input', (e) => {
                     e.target.value = e.target.value.toUpperCase();
+                    this.handleRealTimeSearch();
                 });
 
+                document.getElementById('searchClear').addEventListener('click', () => {
+                    this.clearSearch();
+                });
+
+                // Filter functionality
+                document.getElementById('courseFilter').addEventListener('change', () => {
+                    this.applyFilters();
+                });
+
+                document.getElementById('resultFilter').addEventListener('change', () => {
+                    this.applyFilters();
+                });
+
+                document.getElementById('semesterFilter').addEventListener('change', () => {
+                    this.applyFilters();
+                });
+
+                // Theme and stats
                 document.getElementById('themeToggle').addEventListener('click', () => {
                     this.toggleTheme();
                 });
@@ -762,6 +1230,7 @@
                     this.toggleStats();
                 });
 
+                // Modal functionality
                 document.getElementById('closeModal').addEventListener('click', () => {
                     this.closeSearchModal();
                 });
@@ -772,6 +1241,114 @@
                         this.closeSearchModal();
                     }
                 });
+
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.ctrlKey || e.metaKey) {
+                        switch(e.key) {
+                            case 'k':
+                                e.preventDefault();
+                                document.getElementById('searchInput').focus();
+                                break;
+                            case 'd':
+                                e.preventDefault();
+                                this.toggleTheme();
+                                break;
+                        }
+                    }
+                    if (e.key === 'Escape') {
+                        this.closeSearchModal();
+                        this.closeMobileMenu();
+                    }
+                });
+
+                // Mobile menu
+                window.addEventListener('resize', () => {
+                    if (window.innerWidth > 768 && this.mobileMenuOpen) {
+                        this.closeMobileMenu();
+                    }
+                });
+            }
+
+            setupRealTimeSearch() {
+                let timeout;
+                const searchInput = document.getElementById('searchInput');
+                
+                searchInput.addEventListener('input', () => {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => {
+                        if (searchInput.value.length >= 2) {
+                            this.performRealTimeSearch();
+                        }
+                    }, 300);
+                });
+            }
+
+            handleRealTimeSearch() {
+                const searchValue = document.getElementById('searchInput').value;
+                const clearBtn = document.getElementById('searchClear');
+                clearBtn.style.display = searchValue ? 'block' : 'none';
+            }
+
+            clearSearch() {
+                document.getElementById('searchInput').value = '';
+                document.getElementById('searchClear').style.display = 'none';
+                this.closeSearchModal();
+            }
+
+            performRealTimeSearch() {
+                // Implement real-time search suggestions
+                const searchTerm = document.getElementById('searchInput').value.trim();
+                if (searchTerm.length >= 2) {
+                    // Show search suggestions or instant results
+                    this.highlightMatchingCards(searchTerm);
+                }
+            }
+
+            highlightMatchingCards(searchTerm) {
+                const studentCards = document.querySelectorAll('.student-card');
+                studentCards.forEach(card => {
+                    const studentName = card.querySelector('h4')?.textContent || '';
+                    const regNo = card.querySelector('.reg-no')?.textContent || '';
+                    
+                    if (studentName.toUpperCase().includes(searchTerm) || 
+                        regNo.toUpperCase().includes(searchTerm)) {
+                        card.style.boxShadow = '0 0 20px rgba(102, 126, 234, 0.3)';
+                        card.style.transform = 'scale(1.02)';
+                    } else {
+                        card.style.boxShadow = '';
+                        card.style.transform = '';
+                    }
+                });
+            }
+
+            // Mobile menu functionality
+            toggleMobileMenu() {
+                if (this.mobileMenuOpen) {
+                    this.closeMobileMenu();
+                } else {
+                    this.openMobileMenu();
+                }
+            }
+
+            openMobileMenu() {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.querySelector('.mobile-overlay');
+                
+                sidebar.classList.add('mobile-open');
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                this.mobileMenuOpen = true;
+            }
+
+            closeMobileMenu() {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.querySelector('.mobile-overlay');
+                
+                sidebar.classList.remove('mobile-open');
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+                this.mobileMenuOpen = false;
             }
 
             toggleTheme() {
@@ -814,6 +1391,8 @@
                     clearInterval(this.countdownTimer);
                     this.countdownTimer = null;
                 }
+                // Remove highlights
+                this.highlightMatchingCards('');
             }
 
             async loadAvailableFiles() {
@@ -823,7 +1402,9 @@
                     'Results Dec 2024.csv',
                     'Results June 2024.csv',
                     'Results April 2024.csv',
-                    'Results October 2023.csv'
+                    'Results October 2023.csv',
+                    'results.csv',
+                    'student_results.csv'
                 ];
 
                 let filesLoaded = 0;
@@ -842,7 +1423,12 @@
                 }
 
                 if (filesLoaded === 0) {
-                    document.getElementById('fileList').innerHTML = '<li class="loading">No result files found in the directory.</li>';
+                    document.getElementById('fileList').innerHTML = `
+                        <li class="loading">
+                            📂 No result files found.<br>
+                            <small>Please upload CSV files to the same directory.</small>
+                        </li>
+                    `;
                 }
             }
 
@@ -852,11 +1438,16 @@
                     dynamicTyping: true,
                     skipEmptyLines: true,
                     complete: (results) => {
-                        this.resultsData.set(filename, results.data);
-                        this.updateFileList();
-                        if (!this.currentFile) {
-                            this.loadFile(filename);
+                        if (results.data && results.data.length > 0) {
+                            this.resultsData.set(filename, results.data);
+                            this.updateFileList();
+                            if (!this.currentFile) {
+                                this.loadFile(filename);
+                            }
                         }
+                    },
+                    error: (error) => {
+                        console.error(`Error parsing ${filename}:`, error);
                     }
                 });
             }
@@ -871,8 +1462,23 @@
                     if (filename === this.currentFile) {
                         listItem.classList.add('active');
                     }
-                    listItem.textContent = this.extractTitleFromFilename(filename);
-                    listItem.addEventListener('click', () => this.loadFile(filename));
+                    listItem.innerHTML = `
+                        📄 ${this.extractTitleFromFilename(filename)}
+                        <small style="display: block; opacity: 0.7; margin-top: 4px;">
+                            ${this.resultsData.get(filename).length} records
+                        </small>
+                    `;
+                    listItem.addEventListener('click', () => {
+                        this.loadFile(filename);
+                        this.closeMobileMenu();
+                    });
+                    listItem.setAttribute('tabindex', '0');
+                    listItem.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') {
+                            this.loadFile(filename);
+                            this.closeMobileMenu();
+                        }
+                    });
                     fileList.appendChild(listItem);
                 }
             }
@@ -885,11 +1491,114 @@
             loadFile(filename) {
                 this.currentFile = filename;
                 this.currentData = this.resultsData.get(filename) || [];
+                this.filteredData = [...this.currentData];
                 
-                document.getElementById('pageTitle').textContent = this.extractTitleFromFilename(filename);
+                document.getElementById('pageTitle').textContent = 
+                    `🎓 ${this.extractTitleFromFilename(filename)}`;
                 this.updateFileList();
                 this.generateDashboard();
                 this.generateCourseTabs();
+                this.populateFilters();
+                this.showNotification(`Loaded ${this.currentData.length} student records`);
+            }
+
+            populateFilters() {
+                const courses = [...new Set(this.currentData.map(record => record.Course_Code))].filter(Boolean);
+                const semesters = [...new Set(this.currentData.map(record => record.Semester))].filter(Boolean);
+
+                // Populate course filter
+                const courseFilter = document.getElementById('courseFilter');
+                courseFilter.innerHTML = '<option value="">All Courses</option>';
+                courses.sort().forEach(course => {
+                    const option = document.createElement('option');
+                    option.value = course;
+                    option.textContent = this.courseNames[course] || course;
+                    courseFilter.appendChild(option);
+                });
+
+                // Populate semester filter
+                const semesterFilter = document.getElementById('semesterFilter');
+                semesterFilter.innerHTML = '<option value="">All Semesters</option>';
+                semesters.sort().forEach(semester => {
+                    const option = document.createElement('option');
+                    option.value = semester;
+                    option.textContent = `Semester ${semester}`;
+                    semesterFilter.appendChild(option);
+                });
+            }
+
+            applyFilters() {
+                const courseFilter = document.getElementById('courseFilter').value;
+                const resultFilter = document.getElementById('resultFilter').value;
+                const semesterFilter = document.getElementById('semesterFilter').value;
+
+                const studentsByRegNo = this.groupByRegNo();
+                const filteredStudents = new Map();
+
+                for (const [regNo, studentData] of studentsByRegNo) {
+                    const student = studentData[0];
+                    let include = true;
+
+                    // Course filter
+                    if (courseFilter && student.Course_Code !== courseFilter) {
+                        include = false;
+                    }
+
+                    // Result filter
+                    if (resultFilter && include) {
+                        const overallResult = student.Overall_Result;
+                        switch (resultFilter) {
+                            case 'pass':
+                                include = overallResult !== 'FAILS';
+                                break;
+                            case 'fail':
+                                include = overallResult === 'FAILS';
+                                break;
+                            case 'distinction':
+                                include = overallResult.includes('Distinction');
+                                break;
+                            case 'first':
+                                include = overallResult.includes('First Class');
+                                break;
+                        }
+                    }
+
+                    // Semester filter
+                    if (semesterFilter && include) {
+                        include = studentData.some(record => record.Semester == semesterFilter);
+                    }
+
+                    if (include) {
+                        filteredStudents.set(regNo, studentData);
+                    }
+                }
+
+                this.generateFilteredCourseTabs(filteredStudents);
+            }
+
+            showNotification(message) {
+                // Create a simple notification
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: var(--success-color);
+                    color: white;
+                    padding: 12px 20px;
+                    border-radius: 8px;
+                    z-index: 2000;
+                    font-weight: 600;
+                    box-shadow: var(--shadow);
+                    animation: slideIn 0.3s ease;
+                `;
+                notification.textContent = message;
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.style.animation = 'slideOut 0.3s ease';
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
             }
 
             generateDashboard() {
@@ -906,28 +1615,44 @@
                                 <th>Failed</th>
                                 <th>First Class</th>
                                 <th>Distinction</th>
-                                <th>Pass %</th>
+                                <th>Pass Rate</th>
                             </tr>
                         </thead>
                         <tbody>
                 `;
 
+                let totalStudents = 0;
+                let totalPassed = 0;
+
                 for (const [course, stats] of courseStats) {
                     const passPercentage = ((stats.passed / stats.total) * 100).toFixed(1);
+                    totalStudents += stats.total;
+                    totalPassed += stats.passed;
+                    
                     html += `
                         <tr>
                             <td><strong>${this.courseNames[course] || course}</strong></td>
                             <td>${stats.total}</td>
-                            <td style="color: var(--pass-color);">${stats.passed}</td>
-                            <td style="color: var(--fail-color);">${stats.failed}</td>
-                            <td style="color: #2b6cb0;">${stats.firstClass}</td>
-                            <td style="color: #805ad5;">${stats.distinction}</td>
-                            <td><strong>${passPercentage}%</strong></td>
+                            <td style="color: var(--success-color); font-weight: 600;">${stats.passed}</td>
+                            <td style="color: var(--error-color); font-weight: 600;">${stats.failed}</td>
+                            <td style="color: var(--accent-color); font-weight: 600;">${stats.firstClass}</td>
+                            <td style="color: var(--secondary-color); font-weight: 600;">${stats.distinction}</td>
+                            <td><strong style="color: ${passPercentage >= 80 ? 'var(--success-color)' : passPercentage >= 60 ? 'var(--warning-color)' : 'var(--error-color)'};">${passPercentage}%</strong></td>
                         </tr>
                     `;
                 }
 
+                const overallPassRate = ((totalPassed / totalStudents) * 100).toFixed(1);
                 html += `
+                        <tr style="background: var(--bg-glass); font-weight: 700;">
+                            <td><strong>OVERALL</strong></td>
+                            <td><strong>${totalStudents}</strong></td>
+                            <td style="color: var(--success-color);"><strong>${totalPassed}</strong></td>
+                            <td style="color: var(--error-color);"><strong>${totalStudents - totalPassed}</strong></td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td><strong style="color: ${overallPassRate >= 80 ? 'var(--success-color)' : overallPassRate >= 60 ? 'var(--warning-color)' : 'var(--error-color)'};">${overallPassRate}%</strong></td>
+                        </tr>
                         </tbody>
                     </table>
                     <div class="chart-container">
@@ -937,9 +1662,8 @@
 
                 dashboardContent.innerHTML = html;
                 
-                // Only create chart if stats are visible
                 if (this.statsVisible) {
-                    this.createChart(courseStats);
+                    setTimeout(() => this.createChart(courseStats), 100);
                 }
             }
 
@@ -981,8 +1705,9 @@
             }
 
             createChart(courseStats) {
-                const ctx = document.getElementById('statsChart').getContext('2d');
-                
+                const ctx = document.getElementById('statsChart')?.getContext('2d');
+                if (!ctx) return;
+
                 const courses = Array.from(courseStats.keys()).map(course => this.courseNames[course] || course);
                 const passedData = Array.from(courseStats.values()).map(stats => stats.passed);
                 const failedData = Array.from(courseStats.values()).map(stats => stats.failed);
@@ -995,45 +1720,64 @@
                             {
                                 label: 'Passed',
                                 data: passedData,
-                                backgroundColor: 'rgba(72, 187, 120, 0.8)',
-                                borderColor: 'rgba(72, 187, 120, 1)',
-                                borderWidth: 1
+                                backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                                borderColor: 'rgba(16, 185, 129, 1)',
+                                borderWidth: 2,
+                                borderRadius: 8,
+                                borderSkipped: false,
                             },
                             {
                                 label: 'Failed',
                                 data: failedData,
-                                backgroundColor: 'rgba(245, 101, 101, 0.8)',
-                                borderColor: 'rgba(245, 101, 101, 1)',
-                                borderWidth: 1
+                                backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                                borderColor: 'rgba(239, 68, 68, 1)',
+                                borderWidth: 2,
+                                borderRadius: 8,
+                                borderSkipped: false,
                             }
                         ]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Course-wise Pass/Fail Statistics',
+                                font: {
+                                    size: 16,
+                                    weight: 'bold'
+                                }
+                            },
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            }
+                        },
                         scales: {
                             y: {
                                 beginAtZero: true,
                                 title: {
                                     display: true,
                                     text: 'Number of Students'
+                                },
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.1)'
                                 }
                             },
                             x: {
                                 title: {
                                     display: true,
                                     text: 'Courses'
+                                },
+                                grid: {
+                                    display: false
                                 }
                             }
                         },
-                        plugins: {
-                            title: {
-                                display: true,
-                                text: 'Course-wise Pass/Fail Statistics'
-                            },
-                            legend: {
-                                display: true
-                            }
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
                         }
                     }
                 });
@@ -1053,6 +1797,10 @@
 
             generateCourseTabs() {
                 const studentsByRegNo = this.groupByRegNo();
+                this.generateFilteredCourseTabs(studentsByRegNo);
+            }
+
+            generateFilteredCourseTabs(studentsByRegNo) {
                 const studentsByCourse = new Map();
 
                 // Group students by course
@@ -1071,6 +1819,11 @@
                 tabButtons.innerHTML = '';
                 tabContents.innerHTML = '';
 
+                if (studentsByCourse.size === 0) {
+                    tabContents.innerHTML = '<p class="loading">No students found matching the current filters.</p>';
+                    return;
+                }
+
                 let isFirst = true;
                 for (const [course, students] of studentsByCourse) {
                     // Create tab button
@@ -1081,6 +1834,10 @@
                         <div class="student-count">${students.length} Students</div>
                     `;
                     tabButton.addEventListener('click', () => this.switchTab(course));
+                    tabButton.setAttribute('tabindex', '0');
+                    tabButton.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') this.switchTab(course);
+                    });
                     tabButtons.appendChild(tabButton);
 
                     // Create tab content
@@ -1102,7 +1859,7 @@
                 document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
                 // Add active class to clicked button and corresponding content
-                event.target.classList.add('active');
+                event.target.closest('.tab-button').classList.add('active');
                 document.getElementById(`tab-${courseCode}`).classList.add('active');
             }
 
@@ -1132,11 +1889,12 @@
                         <div class="student-header">
                             <div class="student-info">
                                 <h4>${firstRecord.Student_Name}</h4>
-                                <p><span class="reg-no">Reg No: ${regNo}</span> | <span class="father-name">Father: ${firstRecord.Father_Name}</span></p>
+                                <p><span class="reg-no">Reg No: ${regNo}</span></p>
+                                <p><span class="father-name">Father: ${firstRecord.Father_Name}</span></p>
                             </div>
                             <div class="student-summary">
-                                <div class="summary-item summary-pass">Passed: ${summary.passed}</div>
-                                <div class="summary-item summary-fail">Failed: ${summary.failed}</div>
+                                <div class="summary-item summary-pass">✅ Passed: ${summary.passed}</div>
+                                <div class="summary-item summary-fail">❌ Failed: ${summary.failed}</div>
                                 <div class="overall-result ${isPassed ? 'pass' : 'fail'}">
                                     ${overallResult}
                                 </div>
@@ -1182,18 +1940,25 @@
                 const searchTerm = document.getElementById('searchInput').value.trim();
                 if (!searchTerm) return;
 
-                const studentsByRegNo = this.groupByRegNo();
-                const searchResults = [];
+                // Show loading
+                const spinner = document.getElementById('searchSpinner');
+                spinner.style.display = 'inline-block';
 
-                for (const [regNo, studentData] of studentsByRegNo) {
-                    const student = studentData[0];
-                    if (regNo.toUpperCase().includes(searchTerm) || 
-                        student.Student_Name.toUpperCase().includes(searchTerm)) {
-                        searchResults.push({ regNo, data: studentData });
+                setTimeout(() => {
+                    const studentsByRegNo = this.groupByRegNo();
+                    const searchResults = [];
+
+                    for (const [regNo, studentData] of studentsByRegNo) {
+                        const student = studentData[0];
+                        if (regNo.toUpperCase().includes(searchTerm) || 
+                            student.Student_Name.toUpperCase().includes(searchTerm)) {
+                            searchResults.push({ regNo, data: studentData });
+                        }
                     }
-                }
 
-                this.displaySearchResults(searchResults, searchTerm);
+                    spinner.style.display = 'none';
+                    this.displaySearchResults(searchResults, searchTerm);
+                }, 500);
             }
 
             displaySearchResults(results, searchTerm) {
@@ -1201,10 +1966,21 @@
                 const searchResults = document.getElementById('searchResults');
 
                 if (results.length === 0) {
-                    searchResults.innerHTML = `<p>No results found for "${searchTerm}"</p>`;
+                    searchResults.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                            <div style="font-size: 3rem; margin-bottom: 16px;">🔍</div>
+                            <h3>No results found</h3>
+                            <p>No students found for "${searchTerm}"</p>
+                            <p style="font-size: 0.875rem; opacity: 0.7;">Try searching with full registration number or complete name</p>
+                        </div>
+                    `;
                 } else {
                     searchResults.innerHTML = `
-                        <p><strong>${results.length} result(s) found for "${searchTerm}":</strong></p>
+                        <div style="margin-bottom: 20px; padding: 16px; background: var(--bg-glass); border-radius: 8px; text-align: center;">
+                            <strong style="color: var(--success-color); font-size: 1.1rem;">
+                                🎯 ${results.length} result(s) found for "${searchTerm}"
+                            </strong>
+                        </div>
                         ${results.map(student => this.generateStudentCard(student.regNo, student.data)).join('')}
                     `;
                 }
@@ -1214,7 +1990,7 @@
             }
 
             startAutoCloseTimer() {
-                let countdown = 10;
+                let countdown = 15;
                 const countdownElement = document.getElementById('countdown');
                 
                 // Clear any existing timers
@@ -1235,14 +2011,141 @@
                 // Set main timer
                 this.searchTimer = setTimeout(() => {
                     this.closeSearchModal();
-                }, 10000);
+                }, 15000);
+            }
+
+            // Export functionality
+            exportToCSV() {
+                const studentsByRegNo = this.groupByRegNo();
+                const csvData = [];
+                
+                // Headers
+                csvData.push([
+                    'Registration Number',
+                    'Student Name',
+                    'Father Name',
+                    'Course',
+                    'Overall Result',
+                    'Subjects Passed',
+                    'Subjects Failed'
+                ]);
+
+                // Data
+                for (const [regNo, studentData] of studentsByRegNo) {
+                    const student = studentData[0];
+                    const summary = this.calculateStudentSummary(studentData);
+                    
+                    csvData.push([
+                        regNo,
+                        student.Student_Name,
+                        student.Father_Name,
+                        this.courseNames[student.Course_Code] || student.Course_Code,
+                        student.Overall_Result,
+                        summary.passed,
+                        summary.failed
+                    ]);
+                }
+
+                const csvContent = csvData.map(row => 
+                    row.map(field => `"${field}"`).join(',')
+                ).join('\n');
+
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                
+                link.setAttribute('href', url);
+                link.setAttribute('download', `${this.extractTitleFromFilename(this.currentFile)}_Export.csv`);
+                link.style.visibility = 'hidden';
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                this.showNotification('📊 CSV export completed successfully!');
+            }
+
+            exportToPDF() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('p', 'mm', 'a4');
+                
+                const studentsByRegNo = this.groupByRegNo();
+                const title = this.extractTitleFromFilename(this.currentFile);
+                
+                // Title
+                doc.setFontSize(18);
+                doc.setFont(undefined, 'bold');
+                doc.text(title, 105, 20, { align: 'center' });
+                
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'normal');
+                doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 105, 30, { align: 'center' });
+                
+                let yPosition = 50;
+                let studentCount = 0;
+                
+                for (const [regNo, studentData] of studentsByRegNo) {
+                    if (yPosition > 250) {
+                        doc.addPage();
+                        yPosition = 20;
+                    }
+                    
+                    const student = studentData[0];
+                    const summary = this.calculateStudentSummary(studentData);
+                    
+                    studentCount++;
+                    
+                    doc.setFontSize(12);
+                    doc.setFont(undefined, 'bold');
+                    doc.text(`${studentCount}. ${student.Student_Name}`, 20, yPosition);
+                    
+                    doc.setFontSize(10);
+                    doc.setFont(undefined, 'normal');
+                    doc.text(`Reg No: ${regNo}`, 20, yPosition + 6);
+                    doc.text(`Course: ${this.courseNames[student.Course_Code] || student.Course_Code}`, 20, yPosition + 12);
+                    doc.text(`Result: ${student.Overall_Result}`, 20, yPosition + 18);
+                    doc.text(`Passed: ${summary.passed} | Failed: ${summary.failed}`, 20, yPosition + 24);
+                    
+                    yPosition += 35;
+                }
+                
+                doc.save(`${title}_Report.pdf`);
+                this.showNotification('📄 PDF export completed successfully!');
             }
         }
 
         // Initialize the application
+        let app;
         document.addEventListener('DOMContentLoaded', () => {
-            new ResultsApp();
+            app = new EnhancedResultsApp();
         });
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>

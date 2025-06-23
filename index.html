@@ -1,49 +1,40 @@
-.student-info {
-                width: 100%;
-                margin-bottom: 5px;
-            }
-
-            .student-info h4 {
-                font-size: 1rem;
-                margin-bottom: 2px;
-            }
-
-            .student-info p {
-                font-size: 0.8rem;
-                line-height: 1.2;
-            }<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Diploma Results Management System</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
         :root {
-            --primary-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --primary-color: #667eea;
-            --text-color: #000000;
-            --text-secondary: #4a5568;
-            --bg-white: rgba(255, 255, 255, 0.95);
-            --border-color: #e2e8f0;
-            --hover-bg: #f7fafc;
-            --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            --pass-color: #22543d;
-            --fail-color: #742a2a;
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #06b6d4;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --surface-elevated: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --glass-border: rgba(255, 255, 255, 0.2);
         }
 
         [data-theme="dark"] {
-            --primary-bg: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
-            --primary-color: #667eea;
-            --text-color: #ffffff;
-            --text-secondary: #cbd5e0;
-            --bg-white: rgba(45, 55, 72, 0.95);
-            --border-color: #4a5568;
-            --hover-bg: #2d3748;
-            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            --pass-color: #68d391;
-            --fail-color: #fc8181;
+            --background: #0f172a;
+            --surface: #1e293b;
+            --surface-elevated: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+            --glass-bg: rgba(30, 41, 59, 0.95);
+            --glass-border: rgba(255, 255, 255, 0.1);
         }
 
         * {
@@ -54,130 +45,504 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--primary-bg);
-            min-height: 100vh;
-            color: var(--text-color);
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
             transition: all 0.3s ease;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            /* Better touch scrolling */
+            -webkit-overflow-scrolling: touch;
+            touch-action: manipulation;
         }
 
         .container {
-            width: 100%;
-            min-height: 100vh;
-            padding: 0 20px;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0 1rem;
         }
 
+        /* Header */
         .header {
-            background: var(--bg-white);
+            background: var(--glass-bg);
             backdrop-filter: blur(10px);
-            padding: 20px;
-            border-radius: 0 0 12px 12px;
-            margin: 0 0 20px 0;
-            box-shadow: var(--shadow);
+            border-bottom: 1px solid var(--glass-border);
             position: sticky;
             top: 0;
-            z-index: 200;
-            border-bottom: 2px solid var(--border-color);
-            width: 100%;
+            z-index: 100;
+            padding: 1rem 0;
         }
 
-        .header h1 {
-            color: var(--text-color);
-            font-size: 2rem;
-            margin-bottom: 10px;
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
-        .theme-toggle {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 45px;
-            height: 45px;
-            cursor: pointer;
-            font-size: 1.2rem;
-            transition: all 0.3s ease;
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .header-controls {
             display: flex;
             align-items: center;
-            justify-content: center;
-        }
-
-        .theme-toggle:hover {
-            transform: scale(1.1);
-            background: #5a67d8;
+            gap: 1rem;
+            flex-wrap: wrap;
         }
 
         .search-container {
+            position: relative;
             display: flex;
-            gap: 10px;
-            align-items: center;
-            margin-top: 15px;
+            gap: 0.5rem;
         }
 
         .search-input {
-            flex: 1;
-            padding: 12px 16px;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-            background: var(--bg-white);
-            color: var(--text-color);
-            text-transform: uppercase;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            background: var(--surface);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            width: 200px;
+            transition: all 0.3s ease;
         }
 
         .search-input:focus {
             outline: none;
             border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
-        .search-btn {
-            padding: 12px 24px;
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
             background: var(--primary-color);
             color: white;
-            border: none;
-            border-radius: 8px;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--surface-elevated);
+        }
+
+        /* Dashboard */
+        .dashboard {
+            margin: 2rem 0;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .dashboard-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-card h3 {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .change {
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .change.positive {
+            color: var(--success-color);
+        }
+
+        .change.negative {
+            color: var(--danger-color);
+        }
+
+
+
+        /* Tabs */
+        .tabs {
+            background: var(--surface);
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .tab-headers {
+            display: flex;
+            background: var(--surface-elevated);
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .tab-headers::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-header {
+            padding: 1rem 1.5rem;
             cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+            font-weight: 500;
         }
 
-        .search-btn:hover {
-            background: #5a67d8;
+        .tab-header:hover {
+            background: var(--background);
         }
 
-        .loading-overlay {
+        .tab-header.active {
+            border-bottom-color: var(--primary-color);
+            color: var(--primary-color);
+            background: var(--background);
+        }
+
+        .tab-content {
+            padding: 2rem;
+            min-height: 400px;
+        }
+
+        /* Student Cards - Horizontal Layout */
+        .students-container {
+            margin-top: 1rem;
+        }
+
+        .students-scroll {
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            padding-bottom: 1rem;
+        }
+
+        .students-scroll::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .students-scroll::-webkit-scrollbar-track {
+            background: var(--background);
+            border-radius: 4px;
+        }
+
+        .students-scroll::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        .students-scroll::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        .students-grid {
+            display: flex;
+            gap: 1.5rem;
+            padding: 0.5rem 0;
+            min-height: 400px;
+        }
+
+        .student-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            min-width: 400px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .student-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .student-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            flex-shrink: 0;
+        }
+
+        .student-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .student-info h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .student-info p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 0.1rem;
+        }
+
+        .result-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .result-badge.distinction {
+            background: rgba(168, 85, 247, 0.1);
+            color: #a855f7;
+        }
+
+        .result-badge.first-class {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .result-badge.second-class {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .result-badge.fails {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+        }
+
+        .result-badge.unknown {
+            background: rgba(100, 116, 139, 0.1);
+            color: var(--text-secondary);
+        }
+
+        /* Subject Table */
+        .subjects-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            flex: 1;
+        }
+
+        .subjects-table th,
+        .subjects-table td {
+            padding: 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 120px;
+        }
+
+        .subjects-table th:nth-child(2),
+        .subjects-table td:nth-child(2) {
+            max-width: 150px;
+            min-width: 120px;
+        }
+
+        .subjects-table th {
+            background: var(--surface-elevated);
+            font-weight: 600;
+            color: var(--text-secondary);
+            position: sticky;
+            top: 0;
+        }
+
+        .subjects-table tr:hover {
+            background: var(--background);
+        }
+
+        .grade {
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.8rem;
+        }
+
+        .grade.pass {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .grade.fail {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+        }
+
+        /* Modal */
+        .modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.5);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            backdrop-filter: blur(5px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
         }
 
-        .loading-content {
-            background: var(--bg-white);
-            padding: 40px;
-            border-radius: 12px;
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--surface);
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            transform: scale(0.9);
+            transition: all 0.3s ease;
+        }
+
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .countdown {
+            background: var(--danger-color);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.8rem;
+            margin-left: 1rem;
+        }
+
+        /* File Upload */
+        .file-upload {
             text-align: center;
-            box-shadow: var(--shadow);
+            padding: 3rem 1rem;
+            border: 2px dashed var(--border);
+            border-radius: 1rem;
+            margin: 2rem 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .file-upload:hover {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .file-upload.dragover {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.1);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
         }
 
         .spinner {
-            border: 4px solid var(--border-color);
-            border-top: 4px solid var(--primary-color);
-            border-radius: 50%;
             width: 40px;
             height: 40px;
+            border: 4px solid var(--border);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+            margin: 0 auto 1rem;
         }
 
         @keyframes spin {
@@ -185,1316 +550,954 @@
             100% { transform: rotate(360deg); }
         }
 
-        .dashboard {
-            background: var(--bg-white);
-            backdrop-filter: blur(10px);
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow);
-        }
-
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .dashboard h2 {
-            color: var(--text-color);
-            font-size: 1.5rem;
-        }
-
-        .toggle-stats {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: background-color 0.3s ease;
-        }
-
-        .toggle-stats:hover {
-            background: #5a67d8;
-        }
-
-        .dashboard-content {
-            transition: all 0.3s ease;
-        }
-
-        .dashboard-content.hidden {
-            display: none;
-        }
-
-        .stats-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-            background: var(--bg-white);
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-        }
-
-        .stats-table th,
-        .stats-table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-color);
-        }
-
-        .stats-table th {
-            background: var(--hover-bg);
-            color: var(--text-color);
-            font-weight: 600;
-        }
-
-        .stats-table tr:hover {
-            background: var(--hover-bg);
-        }
-
-        .chart-container {
-            width: 100%;
-            max-width: 800px;
-            height: 400px;
-            margin: 0 auto;
-        }
-
-        .course-tabs {
-            background: var(--bg-white);
-            backdrop-filter: blur(10px);
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow);
-            position: sticky;
-            top: 140px;
-            z-index: 150;
-            border: 2px solid var(--border-color);
-            width: 100%;
-        }
-
-        .course-tabs h2 {
-            color: var(--text-color);
-            margin-bottom: 20px;
-            font-size: 1.5rem;
-        }
-
-        .tab-buttons {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .tab-button {
-            padding: 20px;
-            background: var(--hover-bg);
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: var(--text-color);
-            font-weight: 600;
-            text-align: center;
-            box-shadow: var(--shadow);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .tab-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--primary-color);
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
-        }
-
-        .tab-button:hover::before {
-            transform: scaleX(1);
-        }
-
-        .tab-button:hover {
-            background: rgba(102, 126, 234, 0.1);
-            border-color: var(--primary-color);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        .tab-button.active {
-            background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.3);
-        }
-
-        .tab-button.active::before {
-            transform: scaleX(1);
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        .course-name {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .student-count {
-            font-size: 0.9rem;
-            opacity: 0.8;
-            font-weight: 500;
-        }
-
-        .tab-content {
-            display: none;
-            margin-top: 20px;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .pagination-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            margin: 20px 0;
-            padding: 20px;
-            background: var(--bg-white);
-            border-radius: 8px;
-            box-shadow: var(--shadow);
-        }
-
-        .pagination-btn {
-            padding: 8px 16px;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .pagination-btn:hover:not(:disabled) {
-            background: #5a67d8;
-        }
-
-        .pagination-btn:disabled {
-            background: var(--border-color);
-            cursor: not-allowed;
-        }
-
-        .pagination-info {
-            color: var(--text-color);
-            font-weight: 600;
-            margin: 0 15px;
-        }
-
-        .student-card {
-            background: var(--bg-white);
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 16px;
-            margin-top: 8px;
-            box-shadow: var(--shadow);
-            transition: transform 0.3s ease;
-        }
-
-        .student-card:first-child {
-            margin-top: 24px;
-        }
-
-        .student-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .student-card.pass {
-            border-left: 5px solid #48bb78;
-        }
-
-        .student-card.fail {
-            border-left: 5px solid #f56565;
-        }
-
-        .student-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .student-info h4 {
-            color: var(--text-color);
-            font-size: 1.1rem;
-            font-weight: bold;
-        }
-
-        .student-info p {
-            color: var(--text-color);
-            font-size: 0.9rem;
-            margin-top: 4px;
-        }
-
-        .student-info .reg-no,
-        .student-info .father-name {
-            font-weight: bold;
-        }
-
-        .student-summary {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex-wrap: wrap;
-            justify-content: flex-start;
-        }
-
-        .summary-item {
-            background: rgba(102, 126, 234, 0.1);
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-
-        .summary-pass {
-            background: rgba(72, 187, 120, 0.2);
-            color: var(--pass-color);
-        }
-
-        .summary-fail {
-            background: rgba(245, 101, 101, 0.2);
-            color: var(--fail-color);
-        }
-
-        .overall-result {
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            white-space: nowrap;
-        }
-
-        .overall-result.pass {
-            background: #c6f6d5;
-            color: #22543d;
-        }
-
-        .overall-result.fail {
-            background: #fed7d7;
-            color: #742a2a;
-        }
-
-        .table-container {
-            overflow-x: auto;
-            margin-top: 12px;
-        }
-
-        .subjects-table {
-            width: 100%;
-            min-width: 800px;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-            table-layout: fixed;
-        }
-
-        .subjects-table th,
-        .subjects-table td {
-            padding: 8px;
-            text-align: center;
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .subjects-table th {
-            background: var(--hover-bg);
-            color: var(--text-color);
-            font-weight: 600;
-            position: sticky;
-            top: 0;
-        }
-
-        .subjects-table th:nth-child(1) { width: 60px; }
-        .subjects-table th:nth-child(2) { width: 100px; }
-        .subjects-table th:nth-child(3) { width: 250px; }
-        .subjects-table th:nth-child(4) { width: 70px; }
-        .subjects-table th:nth-child(5) { width: 80px; }
-        .subjects-table th:nth-child(6) { width: 90px; }
-        .subjects-table th:nth-child(7) { width: 70px; }
-        .subjects-table th:nth-child(8) { width: 70px; }
-        .subjects-table th:nth-child(9) { width: 70px; }
-
-        .subjects-table td:nth-child(2),
-        .subjects-table td:nth-child(3) {
-            text-align: left;
-        }
-
-        .result-pass {
-            color: var(--pass-color);
-            font-weight: 600;
-        }
-
-        .result-fail {
-            color: var(--fail-color);
-            font-weight: 600;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(5px);
-        }
-
-        .modal-content {
-            background: var(--bg-white);
-            margin: 5% auto;
-            padding: 20px;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 800px;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--border-color);
-        }
-
-        .modal-header h2 {
-            color: var(--text-color);
-        }
-
-        .close {
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            color: var(--text-color);
-            transition: color 0.3s ease;
-        }
-
-        .close:hover {
-            color: var(--primary-color);
-        }
-
-        .auto-close-notice {
-            background: rgba(102, 126, 234, 0.1);
-            color: var(--text-color);
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .error-container {
-            background: var(--bg-white);
-            padding: 40px;
-            border-radius: 12px;
-            margin: 20px;
-            text-align: center;
-            box-shadow: var(--shadow);
-        }
-
-        .error-message {
-            color: var(--fail-color);
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-        }
-
-        .retry-btn {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.3s ease;
-            display: inline-block;
-        }
-
-        .retry-btn:hover {
-            background: #5a67d8;
-        }
-
-        #selectFileBtn {
-            background: #48bb78;
-        }
-
-        #selectFileBtn:hover {
-            background: #38a169;
-        }
-
+        /* Responsive Design - Mobile First */
         @media (max-width: 768px) {
             .container {
-                padding: 0 15px;
+                padding: 0 0.75rem;
             }
 
             .header {
-                position: sticky;
-                top: 0;
-                margin: 0 0 15px 0;
-                border-radius: 0 0 8px 8px;
-                padding: 15px;
+                padding: 0.75rem 0;
             }
 
-            .course-tabs {
-                position: sticky;
-                top: 110px;
-                z-index: 150;
-                margin: 0 0 15px 0;
-                padding: 15px;
+            .header-content {
+                flex-direction: column;
+                gap: 0.75rem;
             }
 
-            .dashboard {
-                margin-bottom: 20px;
+            .header-controls {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .search-container {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .search-input {
+                flex: 1;
+                min-width: 0;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+
+            .btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+                min-height: 44px; /* Better touch target */
+            }
+
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .dashboard-title {
+                font-size: 1.25rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+                gap: 1rem;
+            }
+
+            .stat-card {
+                padding: 1rem;
+            }
+
+            .stat-card .value {
+                font-size: 1.5rem;
+            }
+
+            .students-grid {
+                gap: 1rem;
+            }
+
+            .student-card {
+                min-width: 300px;
+                padding: 1rem;
+            }
+
+            .student-info h4 {
+                font-size: 1rem;
+            }
+
+            .student-info p {
+                font-size: 0.85rem;
             }
 
             .student-header {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 8px;
+                gap: 0.5rem;
             }
 
-            .student-summary {
-                gap: 6px;
-                width: 100%;
-                justify-content: flex-start;
+            .result-badge {
+                align-self: flex-start;
+                padding: 0.375rem 0.75rem;
+                font-size: 0.75rem;
             }
 
-            .summary-item {
-                padding: 3px 6px;
-                font-size: 0.65rem;
-                border-radius: 10px;
+            .tab-headers {
+                padding: 0;
             }
 
-            .overall-result {
-                padding: 4px 8px;
-                font-size: 0.65rem;
-                border-radius: 12px;
+            .tab-header {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
 
-            .tab-buttons {
-                grid-template-columns: 1fr;
-                gap: 10px;
+            .tab-content {
+                padding: 1rem 0.75rem;
             }
 
-            .tab-button {
-                padding: 15px;
-                text-align: center;
+            /* Hide horizontal scroll hint on mobile */
+            .students-container > div:first-child span:last-child {
+                display: none;
+            }
+
+            .modal-content {
+                margin: 0.5rem;
+                padding: 1rem;
+                max-width: calc(100vw - 1rem);
+                max-height: calc(100vh - 1rem);
+            }
+
+            .modal-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
             }
 
             .subjects-table {
+                font-size: 0.75rem;
+            }
+
+            .subjects-table th,
+            .subjects-table td {
+                padding: 0.375rem 0.25rem;
+                max-width: 80px;
+            }
+
+            .subjects-table th:nth-child(2),
+            .subjects-table td:nth-child(2) {
+                max-width: 100px;
+                min-width: 80px;
+            }
+
+            .subjects-table th:first-child,
+            .subjects-table td:first-child {
+                min-width: 30px;
+                max-width: 30px;
+            }
+
+            .file-upload {
+                padding: 2rem 1rem;
+                margin: 1rem 0;
+            }
+
+            .logo {
+                font-size: 1.25rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 0.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 0.75rem;
+            }
+
+            .stat-card {
+                padding: 0.75rem;
+            }
+
+            .stat-card h3 {
                 font-size: 0.8rem;
-                min-width: 900px;
             }
 
-            .table-container {
-                border-radius: 8px;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            .stat-card .value {
+                font-size: 1.25rem;
             }
 
-            .pagination-container {
-                flex-wrap: wrap;
-                gap: 5px;
+            .student-card {
+                min-width: 280px;
+                padding: 0.75rem;
             }
 
-            .pagination-info {
-                margin: 0 5px;
-                order: -1;
-                width: 100%;
-                text-align: center;
-                margin-bottom: 10px;
+            .student-info h4 {
+                font-size: 0.95rem;
             }
+
+            .student-info p {
+                font-size: 0.8rem;
+            }
+
+            .tab-header {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.8rem;
+            }
+
+            .subjects-table {
+                font-size: 0.7rem;
+            }
+
+            .subjects-table th,
+            .subjects-table td {
+                padding: 0.25rem 0.125rem;
+                max-width: 60px;
+            }
+
+            .subjects-table th:nth-child(2),
+            .subjects-table td:nth-child(2) {
+                max-width: 80px;
+                min-width: 60px;
+            }
+
+            .btn {
+                padding: 0.625rem 0.75rem;
+                font-size: 0.85rem;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Additional utility classes */
+        .text-center { text-align: center; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .mt-2 { margin-top: 1rem; }
+        .p-1 { padding: 0.5rem; }
+        .overflow-x-auto { 
+            overflow-x: auto; 
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+        }
+
+        /* Custom scrollbar for webkit browsers */
+        .overflow-x-auto::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .overflow-x-auto::-webkit-scrollbar-track {
+            background: var(--background);
+        }
+
+        .overflow-x-auto::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
         }
     </style>
 </head>
 <body>
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-content">
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo" id="mainTitle">📊 Diploma Results System</div>
+                <div class="header-controls">
+                    <div class="search-container">
+                        <input type="text" class="search-input" id="searchInput" 
+                               placeholder="Search by Reg No or Name..." maxlength="50">
+                        <button class="btn btn-primary" id="searchBtn">🔍 Search</button>
+                    </div>
+                    <button class="btn btn-outline" id="themeToggle">🌙</button>
+                    <button class="btn btn-outline" id="toggleStats">📈 Stats</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- File Upload Area -->
+        <div class="file-upload" id="fileUpload">
+            <div>📁 Drop your CSV file here or click to upload</div>
+            <div style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                Supports: results.csv, Results Nov 2025.csv
+            </div>
+            <input type="file" class="file-input" id="csvFile" accept=".csv">
+        </div>
+
+        <!-- Loading -->
+        <div class="loading" id="loading">
             <div class="spinner"></div>
-            <h3 id="loadingTitle">Loading Results Data...</h3>
-            <p id="loadingMessage">Please wait while we process the file</p>
-        </div>
-    </div>
-
-    <div class="container" id="mainContainer" style="display: none;">
-        <div class="header">
-            <button class="theme-toggle" id="themeToggle">🌓</button>
-            <h1 id="pageTitle">Diploma Results Management System</h1>
-            <div class="search-container">
-                <input type="text" class="search-input" id="searchInput" 
-                       placeholder="Search by Registration Number or Student Name...">
-                <button class="search-btn" id="searchBtn">Search</button>
-            </div>
+            <p>Processing results data...</p>
         </div>
 
-        <div class="dashboard" id="dashboard">
+        <!-- Dashboard -->
+        <section class="dashboard" id="dashboard" style="display: none;">
             <div class="dashboard-header">
-                <h2>Course-wise Statistics</h2>
-                <button class="toggle-stats" id="toggleStats">Hide Statistics</button>
+                <h2 class="dashboard-title">📊 Performance Dashboard</h2>
+                <div class="stats-toggle">
+                    <span id="statsStatus">Visible</span>
+                </div>
             </div>
-            <div class="dashboard-content" id="dashboardContent">
-                <p class="loading">Processing data...</p>
+
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <h3>Total Students</h3>
+                    <div class="value" id="totalStudents">0</div>
+                    <div class="change positive">All Courses</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Pass Rate</h3>
+                    <div class="value" id="passRate">0%</div>
+                    <div class="change" id="passRateChange">Overall Performance</div>
+                </div>
+                <div class="stat-card">
+                    <h3>First Class & Above</h3>
+                    <div class="value" id="firstClassCount">0</div>
+                    <div class="change positive" id="firstClassPercent">Excellence Rate</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Distinction</h3>
+                    <div class="value" id="distinctionCount">0</div>
+                    <div class="change positive" id="distinctionPercent">Top Performers</div>
+                </div>
             </div>
-        </div>
 
-        <div class="course-tabs" id="courseTabs">
-            <h2>Student Results by Course</h2>
-            <div class="tab-buttons" id="tabButtons"></div>
-        </div>
 
-        <div id="tabContents"></div>
-    </div>
+        </section>
 
-    <div class="error-container" id="errorContainer" style="display: none;">
-        <div class="error-message" id="errorMessage">
-            Failed to load results file. Please ensure 'results.csv' is available.
-        </div>
-        <div style="margin: 20px 0;">
-            <input type="file" id="fileInput" accept=".csv" style="display: none;">
-            <button class="retry-btn" id="selectFileBtn">Select CSV File</button>
-            <button class="retry-btn" id="retryBtn" style="margin-left: 10px;">Retry Auto-Load</button>
-        </div>
-        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 15px;">
-            You can either place 'results.csv' in the same folder as this HTML file, or manually select your CSV file using the button above.
-        </p>
-    </div>
+        <!-- Course Tabs -->
+        <section class="tabs" id="courseTabs" style="display: none;">
+            <div class="tab-headers" id="tabHeaders">
+                <!-- Dynamic tabs will be inserted here -->
+            </div>
+            <div class="tab-content" id="tabContent">
+                <!-- Dynamic content will be inserted here -->
+            </div>
+        </section>
+    </main>
 
     <!-- Search Results Modal -->
-    <div id="searchModal" class="modal">
+    <div class="modal" id="searchModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Search Results</h2>
-                <span class="close" id="closeModal">&times;</span>
+                <h3 class="modal-title">🔍 Search Results</h3>
+                <div style="display: flex; align-items: center;">
+                    <span class="countdown" id="countdown">10</span>
+                    <button class="close-btn" id="closeModal">&times;</button>
+                </div>
             </div>
-            <div class="auto-close-notice">This window will close automatically in <span id="countdown">10</span> seconds</div>
-            <div id="searchResults"></div>
+            <div id="searchResults">
+                <!-- Search results will be displayed here -->
+            </div>
         </div>
     </div>
 
     <script>
-        class OptimizedResultsApp {
+        class DiplomaResultsSystem {
             constructor() {
-                this.currentData = [];
-                this.studentsByRegNo = new Map();
-                this.studentsByCourse = new Map();
-                this.searchTimer = null;
-                this.countdownTimer = null;
-                this.currentPage = 1;
-                this.itemsPerPage = 20;
+                this.data = [];
+                this.students = new Map();
+                this.courses = new Map();
                 this.currentCourse = null;
-                this.searchDebounceTimer = null;
+                this.searchTimer = null;
+                this.currentFileName = '';
                 
-                this.courseNames = {
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.loadTheme();
+                this.tryLoadDefaultFile();
+            }
+
+            setupEventListeners() {
+                // File upload
+                const fileUpload = document.getElementById('fileUpload');
+                const csvFile = document.getElementById('csvFile');
+
+                fileUpload.addEventListener('click', () => csvFile.click());
+                fileUpload.addEventListener('dragover', this.handleDragOver.bind(this));
+                fileUpload.addEventListener('drop', this.handleDrop.bind(this));
+                csvFile.addEventListener('change', this.handleFileSelect.bind(this));
+
+                // Search
+                const searchInput = document.getElementById('searchInput');
+                const searchBtn = document.getElementById('searchBtn');
+                
+                searchInput.addEventListener('input', (e) => {
+                    // Auto-uppercase for registration numbers
+                    if (/^[0-9]/.test(e.target.value)) {
+                        e.target.value = e.target.value.toUpperCase();
+                    }
+                });
+                
+                searchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.performSearch();
+                });
+                
+                searchBtn.addEventListener('click', this.performSearch.bind(this));
+
+                // Theme toggle
+                document.getElementById('themeToggle').addEventListener('click', this.toggleTheme.bind(this));
+
+                // Stats toggle
+                document.getElementById('toggleStats').addEventListener('click', this.toggleStats.bind(this));
+
+                // Modal
+                document.getElementById('closeModal').addEventListener('click', this.closeModal.bind(this));
+                document.getElementById('searchModal').addEventListener('click', (e) => {
+                    if (e.target.id === 'searchModal') this.closeModal();
+                });
+            }
+
+            async tryLoadDefaultFile() {
+                try {
+                    // Show loading state immediately
+                    this.showLoading();
+                    
+                    // List of possible filenames to try
+                    const currentYear = new Date().getFullYear();
+                    const currentMonth = new Date().toLocaleString('default', { month: 'short' });
+                    
+                    const possibleFilenames = [
+                        'Results Nov 2025.csv',
+                        `Results ${currentMonth} ${currentYear}.csv`,
+                        'results.csv',
+                        'Results.csv',
+                        'diploma_results.csv',
+                        'student_results.csv'
+                    ];
+                    
+                    let csvText = null;
+                    let loadedFileName = '';
+                    
+                    for (const filename of possibleFilenames) {
+                        try {
+                            console.log(`🔍 Trying to load: ${filename}`);
+                            const response = await fetch(filename);
+                            if (response.ok) {
+                                csvText = await response.text();
+                                loadedFileName = filename;
+                                console.log(`✅ Successfully loaded: ${filename}`);
+                                break;
+                            }
+                        } catch (error) {
+                            console.log(`❌ Failed to load: ${filename}`);
+                        }
+                    }
+                    
+                    if (csvText && loadedFileName) {
+                        this.currentFileName = loadedFileName;
+                        this.updateTitle(loadedFileName);
+                        await this.processCSV(csvText);
+                        console.log(`✅ Data processed successfully from: ${loadedFileName}`);
+                    } else {
+                        throw new Error('No CSV files found');
+                    }
+                    
+                } catch (error) {
+                    console.log('📁 No default CSV files found - waiting for user upload');
+                    this.hideLoading();
+                    // Show file upload area
+                    document.getElementById('fileUpload').style.display = 'block';
+                }
+            }
+
+            handleDragOver(e) {
+                e.preventDefault();
+                e.currentTarget.classList.add('dragover');
+            }
+
+            handleDrop(e) {
+                e.preventDefault();
+                e.currentTarget.classList.remove('dragover');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0 && files[0].type === 'text/csv') {
+                    this.loadFile(files[0]);
+                }
+            }
+
+            handleFileSelect(e) {
+                const file = e.target.files[0];
+                if (file && file.type === 'text/csv') {
+                    this.loadFile(file);
+                }
+            }
+
+            async loadFile(file) {
+                this.showLoading();
+                
+                try {
+                    this.currentFileName = file.name;
+                    this.updateTitle(file.name);
+                    const text = await file.text();
+                    await this.processCSV(text);
+                } catch (error) {
+                    console.error('Error loading file:', error);
+                    alert('Error loading file. Please check the CSV format.');
+                    this.hideLoading();
+                }
+            }
+
+            updateTitle(filename) {
+                // Extract month and year from filename pattern: "Results {Month} {Year}.csv"
+                const match = filename.match(/Results\s+([A-Za-z]{3})\s+(\d{4})/i);
+                
+                if (match) {
+                    const month = match[1];
+                    const year = match[2];
+                    
+                    // Convert short month to full month name
+                    const monthNames = {
+                        'jan': 'January', 'feb': 'February', 'mar': 'March',
+                        'apr': 'April', 'may': 'May', 'jun': 'June',
+                        'jul': 'July', 'aug': 'August', 'sep': 'September',
+                        'oct': 'October', 'nov': 'November', 'dec': 'December'
+                    };
+                    
+                    const fullMonth = monthNames[month.toLowerCase()] || month;
+                    const title = `📊 Diploma Results - ${fullMonth} ${year}`;
+                    
+                    document.getElementById('mainTitle').textContent = title;
+                } else {
+                    // Fallback title if pattern doesn't match
+                    document.getElementById('mainTitle').textContent = '📊 Diploma Results System';
+                }
+            }
+
+            async processCSV(csvText) {
+                return new Promise((resolve, reject) => {
+                    Papa.parse(csvText, {
+                        header: true,
+                        dynamicTyping: true,
+                        skipEmptyLines: true,
+                        complete: (results) => {
+                            try {
+                                this.data = results.data;
+                                this.processData();
+                                this.renderDashboard();
+                                this.renderCourseTabs();
+                                this.hideLoading();
+                                this.showResults();
+                                resolve();
+                            } catch (error) {
+                                reject(error);
+                            }
+                        },
+                        error: (error) => reject(error)
+                    });
+                });
+            }
+
+            processData() {
+                this.students.clear();
+                this.courses.clear();
+
+                // Group by registration number
+                const studentGroups = {};
+                
+                this.data.forEach(row => {
+                    const regNo = row.Reg_No;
+                    if (!regNo) return;
+
+                    if (!studentGroups[regNo]) {
+                        studentGroups[regNo] = {
+                            regNo: regNo,
+                            name: row.Student_Name,
+                            father: row.Father_Name,
+                            course: row.Course_Code,
+                            overallResult: row.Overall_Result,
+                            subjects: []
+                        };
+                    }
+
+                    if (row.Subject_Name) {
+                        studentGroups[regNo].subjects.push({
+                            semester: row.Semester,
+                            qpCode: row.QP_Code,
+                            subject: row.Subject_Name,
+                            ia: row.IA,
+                            theory: row.Tr,
+                            practical: row.Pr,
+                            result: row.Result,
+                            credit: row.Credit,
+                            grade: row.Grade
+                        });
+                    }
+                });
+
+                // Convert to Map and group by course
+                Object.values(studentGroups).forEach(student => {
+                    this.students.set(student.regNo, student);
+                    
+                    if (!this.courses.has(student.course)) {
+                        this.courses.set(student.course, []);
+                    }
+                    this.courses.get(student.course).push(student);
+                });
+
+                // Set current course to first available
+                if (this.courses.size > 0) {
+                    this.currentCourse = this.courses.keys().next().value;
+                }
+            }
+
+            renderDashboard() {
+                const stats = this.calculateStatistics();
+                
+                document.getElementById('totalStudents').textContent = stats.totalStudents;
+                document.getElementById('passRate').textContent = `${stats.passRate}%`;
+                document.getElementById('firstClassCount').textContent = stats.firstClassCount;
+                document.getElementById('distinctionCount').textContent = stats.distinctionCount;
+                
+                document.getElementById('passRateChange').textContent = `${stats.passedStudents}/${stats.totalStudents} passed`;
+                document.getElementById('firstClassPercent').textContent = `${stats.firstClassRate}%`;
+                document.getElementById('distinctionPercent').textContent = `${stats.distinctionRate}%`;
+            }
+
+            calculateStatistics() {
+                const totalStudents = this.students.size;
+                let passedStudents = 0;
+                let firstClassCount = 0;
+                let distinctionCount = 0;
+
+                const courseStats = {};
+
+                this.students.forEach(student => {
+                    const result = student.overallResult;
+                    const course = student.course;
+
+                    if (!courseStats[course]) {
+                        courseStats[course] = { total: 0, passed: 0, failed: 0 };
+                    }
+                    courseStats[course].total++;
+
+                    if (['First Class', 'Second Class', 'Distinction'].includes(result)) {
+                        passedStudents++;
+                        courseStats[course].passed++;
+                    } else if (result === 'FAILS') {
+                        courseStats[course].failed++;
+                    }
+
+                    if (['First Class', 'Distinction'].includes(result)) {
+                        firstClassCount++;
+                    }
+
+                    if (result === 'Distinction') {
+                        distinctionCount++;
+                    }
+                });
+
+                return {
+                    totalStudents,
+                    passedStudents,
+                    passRate: totalStudents > 0 ? Math.round((passedStudents / totalStudents) * 100) : 0,
+                    firstClassCount,
+                    firstClassRate: totalStudents > 0 ? Math.round((firstClassCount / totalStudents) * 100) : 0,
+                    distinctionCount,
+                    distinctionRate: totalStudents > 0 ? Math.round((distinctionCount / totalStudents) * 100) : 0,
+                    courseStats
+                };
+            }
+
+
+
+            renderCourseTabs() {
+                const tabHeaders = document.getElementById('tabHeaders');
+                const tabContent = document.getElementById('tabContent');
+
+                tabHeaders.innerHTML = '';
+                
+                let isFirst = true;
+                for (const [courseCode, students] of this.courses) {
+                    const tab = document.createElement('div');
+                    tab.className = `tab-header ${isFirst ? 'active' : ''}`;
+                    tab.textContent = `${this.getCourseName(courseCode)} (${students.length})`;
+                    tab.addEventListener('click', () => this.switchTab(courseCode, tab));
+                    tabHeaders.appendChild(tab);
+                    
+                    if (isFirst) {
+                        this.renderStudents(courseCode);
+                        isFirst = false;
+                    }
+                }
+            }
+
+            switchTab(courseCode, tabElement) {
+                // Update active tab
+                document.querySelectorAll('.tab-header').forEach(tab => tab.classList.remove('active'));
+                tabElement.classList.add('active');
+                
+                // Render students for this course
+                this.currentCourse = courseCode;
+                this.renderStudents(courseCode);
+            }
+
+            renderStudents(courseCode) {
+                const tabContent = document.getElementById('tabContent');
+                const students = this.courses.get(courseCode) || [];
+
+                tabContent.innerHTML = `
+                    <div class="students-container fade-in">
+                        ${students.length > 0 ? `
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; color: var(--text-secondary); font-size: 0.9rem;">
+                                <span>👥 ${students.length} students</span>
+                                <span>← Scroll horizontally to navigate →</span>
+                            </div>
+                        ` : ''}
+                        <div class="students-scroll">
+                            <div class="students-grid">
+                                ${students.length > 0 ? 
+                                    students.map(student => this.renderStudentCard(student)).join('') :
+                                    '<div style="text-align: center; padding: 3rem; color: var(--text-secondary);">No students found for this course</div>'
+                                }
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderStudentCard(student) {
+                const resultClass = this.getResultClass(student.overallResult);
+                const subjectsTable = student.subjects.length > 0 ? this.renderSubjectsTable(student.subjects) : '<p class="text-center" style="color: var(--text-secondary);">No subject details available</p>';
+
+                return `
+                    <div class="student-card">
+                        <div class="student-header">
+                            <div class="student-info">
+                                <h4>${student.name}</h4>
+                                <p>Reg: ${student.regNo}</p>
+                                <p>Father: ${student.father}</p>
+                            </div>
+                            <span class="result-badge ${resultClass}">${student.overallResult}</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            ${subjectsTable}
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderSubjectsTable(subjects) {
+                if (subjects.length === 0) return '';
+
+                return `
+                    <table class="subjects-table">
+                        <thead>
+                            <tr>
+                                <th>Sem</th>
+                                <th>Subject</th>
+                                <th>IA</th>
+                                <th>Theory</th>
+                                <th>Practical</th>
+                                <th>Grade</th>
+                                <th>Credits</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${subjects.map(subject => `
+                                <tr>
+                                    <td>${subject.semester || '-'}</td>
+                                    <td style="max-width: 200px; word-wrap: break-word;">${subject.subject || '-'}</td>
+                                    <td>${subject.ia || '-'}</td>
+                                    <td>${subject.theory || '-'}</td>
+                                    <td>${subject.practical || '-'}</td>
+                                    <td><span class="grade ${subject.result === 'P' ? 'pass' : 'fail'}">${subject.grade || '-'}</span></td>
+                                    <td>${subject.credit || '-'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            }
+
+            performSearch() {
+                const query = document.getElementById('searchInput').value.trim();
+                if (!query) return;
+
+                const results = [];
+                this.students.forEach(student => {
+                    if (student.regNo.toLowerCase().includes(query.toLowerCase()) ||
+                        student.name.toLowerCase().includes(query.toLowerCase())) {
+                        results.push(student);
+                    }
+                });
+
+                this.showSearchResults(results, query);
+            }
+
+            showSearchResults(results, query) {
+                const modal = document.getElementById('searchModal');
+                const searchResults = document.getElementById('searchResults');
+
+                if (results.length === 0) {
+                    searchResults.innerHTML = `
+                        <div class="text-center p-1">
+                            <p>No results found for "${query}"</p>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem;">Try searching by registration number or student name</p>
+                        </div>
+                    `;
+                } else {
+                    searchResults.innerHTML = `
+                        <div class="mb-2">
+                            <p><strong>${results.length}</strong> result(s) found for "${query}"</p>
+                        </div>
+                        <div class="students-container">
+                            <div class="students-scroll" style="max-height: 60vh;">
+                                <div class="students-grid">
+                                    ${results.map(student => this.renderStudentCard(student)).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                modal.classList.add('active');
+                this.startCountdown();
+            }
+
+            startCountdown() {
+                let count = 10;
+                const countdownEl = document.getElementById('countdown');
+                
+                if (this.searchTimer) clearInterval(this.searchTimer);
+                
+                this.searchTimer = setInterval(() => {
+                    count--;
+                    countdownEl.textContent = count;
+                    
+                    if (count <= 0) {
+                        this.closeModal();
+                    }
+                }, 1000);
+            }
+
+            closeModal() {
+                document.getElementById('searchModal').classList.remove('active');
+                if (this.searchTimer) {
+                    clearInterval(this.searchTimer);
+                    this.searchTimer = null;
+                }
+                document.getElementById('countdown').textContent = '10';
+            }
+
+            getCourseName(code) {
+                const courseNames = {
                     'CE': 'Civil Engineering',
                     'CS': 'Computer Science',
                     'EE': 'Electrical Engineering',
                     'ME': 'Mechanical Engineering',
                     'EC': 'Electronics & Communication'
                 };
-                
-                this.isDarkMode = localStorage.getItem('darkMode') === 'true';
-                this.statsVisible = localStorage.getItem('statsVisible') !== 'false';
-                
-                this.init();
+                return courseNames[code] || code;
             }
 
-            async init() {
-                this.setupEventListeners();
-                this.applyTheme();
-                this.updateStatsVisibility();
-                await this.loadResultsFile();
-            }
-
-            setupEventListeners() {
-                document.getElementById('searchBtn').addEventListener('click', () => {
-                    this.performSearch();
-                });
-
-                document.getElementById('searchInput').addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        this.performSearch();
-                    }
-                });
-
-                document.getElementById('searchInput').addEventListener('input', (e) => {
-                    e.target.value = e.target.value.toUpperCase();
-                    
-                    // Debounced search
-                    clearTimeout(this.searchDebounceTimer);
-                    this.searchDebounceTimer = setTimeout(() => {
-                        if (e.target.value.length > 2) {
-                            this.performSearch();
-                        }
-                    }, 500);
-                });
-
-                document.getElementById('themeToggle').addEventListener('click', () => {
-                    this.toggleTheme();
-                });
-
-                document.getElementById('toggleStats').addEventListener('click', () => {
-                    this.toggleStats();
-                });
-
-                document.getElementById('closeModal').addEventListener('click', () => {
-                    this.closeSearchModal();
-                });
-
-                document.getElementById('retryBtn').addEventListener('click', () => {
-                    this.loadResultsFile();
-                });
-
-                document.getElementById('selectFileBtn').addEventListener('click', () => {
-                    document.getElementById('fileInput').click();
-                });
-
-                document.getElementById('fileInput').addEventListener('change', (e) => {
-                    const file = e.target.files[0];
-                    if (file && file.type === 'text/csv') {
-                        this.loadLocalFile(file);
-                    } else {
-                        alert('Please select a valid CSV file.');
-                    }
-                });
-
-                window.addEventListener('click', (e) => {
-                    const modal = document.getElementById('searchModal');
-                    if (e.target === modal) {
-                        this.closeSearchModal();
-                    }
-                });
+            getResultClass(result) {
+                const resultClasses = {
+                    'Distinction': 'distinction',
+                    'First Class': 'first-class',
+                    'Second Class': 'second-class',
+                    'FAILS': 'fails',
+                    '# Distinction': 'distinction',
+                    '# Second Class': 'second-class'
+                };
+                return resultClasses[result] || 'unknown';
             }
 
             toggleTheme() {
-                this.isDarkMode = !this.isDarkMode;
-                localStorage.setItem('darkMode', this.isDarkMode);
-                this.applyTheme();
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                
+                const themeToggle = document.getElementById('themeToggle');
+                themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
             }
 
-            applyTheme() {
-                document.documentElement.setAttribute('data-theme', this.isDarkMode ? 'dark' : 'light');
-                document.getElementById('themeToggle').textContent = this.isDarkMode ? '☀️' : '🌙';
+            loadTheme() {
+                const savedTheme = localStorage.getItem('theme') || 'light';
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                
+                const themeToggle = document.getElementById('themeToggle');
+                themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
             }
 
             toggleStats() {
-                this.statsVisible = !this.statsVisible;
-                localStorage.setItem('statsVisible', this.statsVisible);
-                this.updateStatsVisibility();
-            }
-
-            updateStatsVisibility() {
-                const content = document.getElementById('dashboardContent');
-                const button = document.getElementById('toggleStats');
+                const statsGrid = document.getElementById('statsGrid');
+                const toggleBtn = document.getElementById('toggleStats');
+                const statusEl = document.getElementById('statsStatus');
                 
-                if (this.statsVisible) {
-                    content.classList.remove('hidden');
-                    button.textContent = 'Hide Statistics';
+                if (statsGrid.style.display === 'none') {
+                    statsGrid.style.display = 'grid';
+                    toggleBtn.textContent = '📈 Hide Stats';
+                    statusEl.textContent = 'Visible';
+                    localStorage.setItem('statsVisible', 'true');
                 } else {
-                    content.classList.add('hidden');
-                    button.textContent = 'Show Statistics';
+                    statsGrid.style.display = 'none';
+                    toggleBtn.textContent = '📈 Show Stats';
+                    statusEl.textContent = 'Hidden';
+                    localStorage.setItem('statsVisible', 'false');
                 }
             }
 
-            async loadResultsFile() {
-                const possibleFiles = ['results.csv', 'Results.csv', 'RESULTS.CSV', 'data.csv', 'Data.csv'];
-                
-                try {
-                    this.showLoading('Searching for CSV files...', 'Looking for results.csv and other common file names...');
-
-                    for (const filename of possibleFiles) {
-                        try {
-                            const response = await fetch(filename);
-                            if (response.ok) {
-                                const csvText = await response.text();
-                                if (csvText.trim()) {
-                                    this.parseCSVFile(csvText);
-                                    return;
-                                }
-                            }
-                        } catch (err) {
-                            console.log(`File ${filename} not found`);
-                        }
-                    }
-                    
-                    throw new Error('No CSV files found');
-                    
-                } catch (error) {
-                    console.error('Error loading file:', error);
-                    this.showError('No CSV file found. Please select a file manually or ensure your CSV file is named "results.csv" and placed in the same directory.');
-                }
-            }
-
-            loadLocalFile(file) {
-                try {
-                    this.showLoading('Reading Selected File...', `Processing ${file.name}...`);
-
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const csvText = e.target.result;
-                        this.parseCSVFile(csvText);
-                    };
-                    reader.onerror = () => {
-                        this.showError('Failed to read the selected file. Please try again.');
-                    };
-                    reader.readAsText(file);
-                } catch (error) {
-                    console.error('Error reading local file:', error);
-                    this.showError('Failed to process the selected file. Please ensure it\'s a valid CSV file.');
-                }
-            }
-
-            showLoading(title, message) {
-                document.getElementById('loadingTitle').textContent = title;
-                document.getElementById('loadingMessage').textContent = message;
-                document.getElementById('loadingOverlay').style.display = 'flex';
-                document.getElementById('mainContainer').style.display = 'none';
-                document.getElementById('errorContainer').style.display = 'none';
-            }
-
-            parseCSVFile(csvText) {
-                if (!csvText || csvText.trim().length === 0) {
-                    this.showError('The CSV file appears to be empty. Please check your file.');
-                    return;
-                }
-
-                this.showLoading('Processing CSV Data...', 'Parsing and organizing student records...');
-
-                Papa.parse(csvText, {
-                    header: true,
-                    dynamicTyping: true,
-                    skipEmptyLines: true,
-                    worker: true, // Use web worker for large files
-                    complete: (results) => {
-                        if (results.errors && results.errors.length > 0) {
-                            console.warn('CSV parsing warnings:', results.errors);
-                        }
-                        
-                        if (!results.data || results.data.length === 0) {
-                            this.showError('No valid data found in the CSV file. Please check your file format.');
-                            return;
-                        }
-
-                        // Validate required columns
-                        const firstRow = results.data[0];
-                        const requiredColumns = ['Reg_No', 'Student_Name', 'Course_Code'];
-                        const missingColumns = requiredColumns.filter(col => !(col in firstRow));
-                        
-                        if (missingColumns.length > 0) {
-                            this.showError(`Missing required columns: ${missingColumns.join(', ')}. Please check your CSV format.`);
-                            return;
-                        }
-
-                        this.currentData = results.data;
-                        this.showLoading('Organizing Data...', `Processing ${results.data.length} records...`);
-                        
-                        // Use setTimeout to allow UI to update
-                        setTimeout(() => {
-                            this.processData();
-                            this.hideLoading();
-                            this.generateDashboard();
-                            this.generateCourseTabs();
-                        }, 100);
-                    },
-                    error: (error) => {
-                        console.error('Parse error:', error);
-                        this.showError('Failed to parse CSV file. Please check the file format and ensure it\'s a valid CSV file.');
-                    }
-                });
-            }
-
-            processData() {
-                // Clear existing data
-                this.studentsByRegNo.clear();
-                this.studentsByCourse.clear();
-
-                // Group by registration number using Map for better performance
-                this.currentData.forEach(row => {
-                    const regNo = row.Reg_No;
-                    if (!this.studentsByRegNo.has(regNo)) {
-                        this.studentsByRegNo.set(regNo, []);
-                    }
-                    this.studentsByRegNo.get(regNo).push(row);
-                });
-
-                // Group by course
-                for (const [regNo, studentData] of this.studentsByRegNo) {
-                    const course = studentData[0].Course_Code;
-                    if (!this.studentsByCourse.has(course)) {
-                        this.studentsByCourse.set(course, []);
-                    }
-                    this.studentsByCourse.get(course).push({ regNo, data: studentData });
-                }
+            showLoading() {
+                document.getElementById('fileUpload').style.display = 'none';
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('dashboard').style.display = 'none';
+                document.getElementById('courseTabs').style.display = 'none';
             }
 
             hideLoading() {
-                document.getElementById('loadingOverlay').style.display = 'none';
-                document.getElementById('mainContainer').style.display = 'block';
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('fileUpload').style.display = 'block';
             }
 
-            showError(message) {
-                document.getElementById('loadingOverlay').style.display = 'none';
-                document.getElementById('mainContainer').style.display = 'none';
-                document.getElementById('errorContainer').style.display = 'block';
-                document.getElementById('errorMessage').textContent = message;
-            }
-
-            generateDashboard() {
-                const courseStats = this.calculateCourseStats();
-                const dashboardContent = document.getElementById('dashboardContent');
-
-                const fragment = document.createDocumentFragment();
+            showResults() {
+                document.getElementById('dashboard').style.display = 'block';
+                document.getElementById('courseTabs').style.display = 'block';
                 
-                // Create table
-                const table = document.createElement('table');
-                table.className = 'stats-table';
+                // Load stats visibility preference
+                const statsVisible = localStorage.getItem('statsVisible') !== 'false';
+                const statsGrid = document.getElementById('statsGrid');
+                const toggleBtn = document.getElementById('toggleStats');
+                const statusEl = document.getElementById('statsStatus');
                 
-                table.innerHTML = `
-                    <thead>
-                        <tr>
-                            <th>Course</th>
-                            <th>Total Students</th>
-                            <th>Passed</th>
-                            <th>Failed</th>
-                            <th>First Class</th>
-                            <th>Distinction</th>
-                            <th>Pass %</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                `;
-
-                const tbody = table.querySelector('tbody');
-
-                for (const [course, stats] of courseStats) {
-                    const passPercentage = ((stats.passed / stats.total) * 100).toFixed(1);
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td><strong>${this.courseNames[course] || course}</strong></td>
-                        <td>${stats.total}</td>
-                        <td style="color: var(--pass-color);">${stats.passed}</td>
-                        <td style="color: var(--fail-color);">${stats.failed}</td>
-                        <td style="color: #2b6cb0;">${stats.firstClass}</td>
-                        <td style="color: #805ad5;">${stats.distinction}</td>
-                        <td><strong>${passPercentage}%</strong></td>
-                    `;
-                    tbody.appendChild(row);
-                }
-
-                fragment.appendChild(table);
-
-                // Create chart container
-                const chartContainer = document.createElement('div');
-                chartContainer.className = 'chart-container';
-                chartContainer.innerHTML = '<canvas id="statsChart"></canvas>';
-                fragment.appendChild(chartContainer);
-
-                dashboardContent.innerHTML = '';
-                dashboardContent.appendChild(fragment);
-                
-                if (this.statsVisible) {
-                    requestAnimationFrame(() => this.createChart(courseStats));
-                }
-            }
-
-            calculateCourseStats() {
-                const courseStats = new Map();
-
-                for (const [regNo, studentData] of this.studentsByRegNo) {
-                    const course = studentData[0].Course_Code;
-                    const overallResult = studentData[0].Overall_Result;
-
-                    if (!courseStats.has(course)) {
-                        courseStats.set(course, {
-                            total: 0,
-                            passed: 0,
-                            failed: 0,
-                            firstClass: 0,
-                            distinction: 0
-                        });
-                    }
-
-                    const stats = courseStats.get(course);
-                    stats.total++;
-
-                    if (overallResult === 'FAILS') {
-                        stats.failed++;
-                    } else {
-                        stats.passed++;
-                        if (overallResult.includes('First Class')) {
-                            stats.firstClass++;
-                        }
-                        if (overallResult.includes('Distinction')) {
-                            stats.distinction++;
-                        }
-                    }
-                }
-
-                return courseStats;
-            }
-
-            createChart(courseStats) {
-                const canvas = document.getElementById('statsChart');
-                if (!canvas) return;
-                
-                const ctx = canvas.getContext('2d');
-                
-                const courses = Array.from(courseStats.keys()).map(course => this.courseNames[course] || course);
-                const passedData = Array.from(courseStats.values()).map(stats => stats.passed);
-                const failedData = Array.from(courseStats.values()).map(stats => stats.failed);
-
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: courses,
-                        datasets: [
-                            {
-                                label: 'Passed',
-                                data: passedData,
-                                backgroundColor: 'rgba(72, 187, 120, 0.8)',
-                                borderColor: 'rgba(72, 187, 120, 1)',
-                                borderWidth: 1
-                            },
-                            {
-                                label: 'Failed',
-                                data: failedData,
-                                backgroundColor: 'rgba(245, 101, 101, 0.8)',
-                                borderColor: 'rgba(245, 101, 101, 1)',
-                                borderWidth: 1
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Number of Students'
-                                }
-                            },
-                            x: {
-                                title: {
-                                    display: true,
-                                    text: 'Courses'
-                                }
-                            }
-                        },
-                        plugins: {
-                            title: {
-                                display: true,
-                                text: 'Course-wise Pass/Fail Statistics'
-                            },
-                            legend: {
-                                display: true
-                            }
-                        }
-                    }
-                });
-            }
-
-            generateCourseTabs() {
-                const tabButtons = document.getElementById('tabButtons');
-                const tabContents = document.getElementById('tabContents');
-                
-                const buttonFragment = document.createDocumentFragment();
-                const contentFragment = document.createDocumentFragment();
-
-                let isFirst = true;
-                for (const [course, students] of this.studentsByCourse) {
-                    // Create tab button
-                    const tabButton = document.createElement('div');
-                    tabButton.className = `tab-button ${isFirst ? 'active' : ''}`;
-                    tabButton.innerHTML = `
-                        <div class="course-name">${this.courseNames[course] || course}</div>
-                        <div class="student-count">${students.length} Students</div>
-                    `;
-                    tabButton.addEventListener('click', () => this.switchTab(course));
-                    buttonFragment.appendChild(tabButton);
-
-                    // Create tab content
-                    const tabContent = document.createElement('div');
-                    tabContent.className = `tab-content ${isFirst ? 'active' : ''}`;
-                    tabContent.id = `tab-${course}`;
-                    contentFragment.appendChild(tabContent);
-
-                    if (isFirst) {
-                        this.currentCourse = course;
-                        this.currentPage = 1;
-                        this.renderStudentPage(course, 1);
-                    }
-
-                    isFirst = false;
-                }
-
-                tabButtons.innerHTML = '';
-                tabContents.innerHTML = '';
-                tabButtons.appendChild(buttonFragment);
-                tabContents.appendChild(contentFragment);
-            }
-
-            switchTab(courseCode) {
-                // Remove active class from all buttons and contents
-                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
-                // Add active class to clicked button and corresponding content
-                event.target.closest('.tab-button').classList.add('active');
-                document.getElementById(`tab-${courseCode}`).classList.add('active');
-
-                // Load students for this course
-                this.currentCourse = courseCode;
-                this.currentPage = 1;
-                this.renderStudentPage(courseCode, 1);
-            }
-
-            renderStudentPage(courseCode, page) {
-                const students = this.studentsByCourse.get(courseCode) || [];
-                const totalPages = Math.ceil(students.length / this.itemsPerPage);
-                const startIndex = (page - 1) * this.itemsPerPage;
-                const endIndex = startIndex + this.itemsPerPage;
-                const pageStudents = students.slice(startIndex, endIndex);
-
-                const tabContent = document.getElementById(`tab-${courseCode}`);
-                if (!tabContent) return;
-
-                const fragment = document.createDocumentFragment();
-
-                // Add pagination controls
-                const paginationContainer = document.createElement('div');
-                paginationContainer.className = 'pagination-container';
-                paginationContainer.innerHTML = `
-                    <button class="pagination-btn" id="prevBtn-${courseCode}" ${page <= 1 ? 'disabled' : ''}>
-                        Previous
-                    </button>
-                    <span class="pagination-info">
-                        Page ${page} of ${totalPages} (${students.length} total students)
-                    </span>
-                    <button class="pagination-btn" id="nextBtn-${courseCode}" ${page >= totalPages ? 'disabled' : ''}>
-                        Next
-                    </button>
-                `;
-                fragment.appendChild(paginationContainer);
-
-                // Add event listeners for pagination
-                setTimeout(() => {
-                    const prevBtn = document.getElementById(`prevBtn-${courseCode}`);
-                    const nextBtn = document.getElementById(`nextBtn-${courseCode}`);
-                    
-                    if (prevBtn) {
-                        prevBtn.addEventListener('click', () => {
-                            if (page > 1) {
-                                this.currentPage = page - 1;
-                                this.renderStudentPage(courseCode, this.currentPage);
-                            }
-                        });
-                    }
-                    
-                    if (nextBtn) {
-                        nextBtn.addEventListener('click', () => {
-                            if (page < totalPages) {
-                                this.currentPage = page + 1;
-                                this.renderStudentPage(courseCode, this.currentPage);
-                            }
-                        });
-                    }
-                }, 0);
-
-                // Add student cards for current page
-                pageStudents.forEach(student => {
-                    const cardDiv = document.createElement('div');
-                    cardDiv.innerHTML = this.generateStudentCard(student.regNo, student.data);
-                    fragment.appendChild(cardDiv.firstElementChild);
-                });
-
-                tabContent.innerHTML = '';
-                tabContent.appendChild(fragment);
-            }
-
-            generateStudentCard(regNo, studentData) {
-                const firstRecord = studentData[0];
-                const overallResult = firstRecord.Overall_Result;
-                const isPassed = overallResult !== 'FAILS';
-                const summary = this.calculateStudentSummary(studentData);
-
-                return `
-                    <div class="student-card ${isPassed ? 'pass' : 'fail'}">
-                        <div class="student-header">
-                            <div class="student-info">
-                                <h4>${firstRecord.Student_Name}</h4>
-                                <p><span class="reg-no">Reg No: ${regNo}</span> | <span class="father-name">Father: ${firstRecord.Father_Name}</span></p>
-                            </div>
-                            <div class="student-summary">
-                                <div class="summary-item summary-pass">Passed: ${summary.passed}</div>
-                                <div class="summary-item summary-fail">Failed: ${summary.failed}</div>
-                                <div class="overall-result ${isPassed ? 'pass' : 'fail'}">
-                                    ${overallResult}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="table-container">
-                            <table class="subjects-table">
-                                <thead>
-                                    <tr>
-                                        <th>Sem</th>
-                                        <th>QP Code</th>
-                                        <th>Subject</th>
-                                        <th>IA</th>
-                                        <th>Theory</th>
-                                        <th>Practical</th>
-                                        <th>Result</th>
-                                        <th>Credit</th>
-                                        <th>Grade</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${studentData.map(subject => `
-                                        <tr>
-                                            <td>${subject.Semester}</td>
-                                            <td>${subject.QP_Code ? subject.QP_Code.replace(':', '') : '--'}</td>
-                                            <td>${subject.Subject_Name}</td>
-                                            <td>${subject.IA || '--'}</td>
-                                            <td>${subject.Tr || '--'}</td>
-                                            <td>${subject.Pr || '--'}</td>
-                                            <td class="${subject.Result === 'P' ? 'result-pass' : 'result-fail'}">${subject.Result}</td>
-                                            <td>${subject.Credit}</td>
-                                            <td>${subject.Grade}</td>
-                                        </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                `;
-            }
-
-            calculateStudentSummary(studentData) {
-                let passed = 0;
-                let failed = 0;
-                
-                studentData.forEach(subject => {
-                    if (subject.Result === 'P') {
-                        passed++;
-                    } else {
-                        failed++;
-                    }
-                });
-
-                return { passed, failed };
-            }
-
-            performSearch() {
-                const searchTerm = document.getElementById('searchInput').value.trim();
-                if (!searchTerm) return;
-
-                const searchResults = [];
-
-                for (const [regNo, studentData] of this.studentsByRegNo) {
-                    const student = studentData[0];
-                    if (regNo.toUpperCase().includes(searchTerm) || 
-                        student.Student_Name.toUpperCase().includes(searchTerm)) {
-                        searchResults.push({ regNo, data: studentData });
-                    }
-                }
-
-                this.displaySearchResults(searchResults, searchTerm);
-            }
-
-            displaySearchResults(results, searchTerm) {
-                const modal = document.getElementById('searchModal');
-                const searchResults = document.getElementById('searchResults');
-
-                if (results.length === 0) {
-                    searchResults.innerHTML = `<p>No results found for "${searchTerm}"</p>`;
+                if (!statsVisible) {
+                    statsGrid.style.display = 'none';
+                    toggleBtn.textContent = '📈 Show Stats';
+                    statusEl.textContent = 'Hidden';
                 } else {
-                    const fragment = document.createDocumentFragment();
-                    const resultInfo = document.createElement('p');
-                    resultInfo.innerHTML = `<strong>${results.length} result(s) found for "${searchTerm}":</strong>`;
-                    fragment.appendChild(resultInfo);
-
-                    results.forEach(student => {
-                        const cardDiv = document.createElement('div');
-                        cardDiv.innerHTML = this.generateStudentCard(student.regNo, student.data);
-                        fragment.appendChild(cardDiv.firstElementChild);
-                    });
-
-                    searchResults.innerHTML = '';
-                    searchResults.appendChild(fragment);
-                }
-
-                modal.style.display = 'block';
-                this.startAutoCloseTimer();
-            }
-
-            startAutoCloseTimer() {
-                let countdown = 10;
-                const countdownElement = document.getElementById('countdown');
-                
-                if (this.searchTimer) clearTimeout(this.searchTimer);
-                if (this.countdownTimer) clearInterval(this.countdownTimer);
-
-                this.countdownTimer = setInterval(() => {
-                    countdown--;
-                    countdownElement.textContent = countdown;
-                    
-                    if (countdown <= 0) {
-                        clearInterval(this.countdownTimer);
-                        this.closeSearchModal();
-                    }
-                }, 1000);
-
-                this.searchTimer = setTimeout(() => {
-                    this.closeSearchModal();
-                }, 10000);
-            }
-
-            closeSearchModal() {
-                document.getElementById('searchModal').style.display = 'none';
-                if (this.searchTimer) {
-                    clearTimeout(this.searchTimer);
-                    this.searchTimer = null;
-                }
-                if (this.countdownTimer) {
-                    clearInterval(this.countdownTimer);
-                    this.countdownTimer = null;
+                    statsGrid.style.display = 'grid';
+                    toggleBtn.textContent = '📈 Hide Stats';
+                    statusEl.textContent = 'Visible';
                 }
             }
         }
 
         // Initialize the application
         document.addEventListener('DOMContentLoaded', () => {
-            new OptimizedResultsApp();
+            new DiplomaResultsSystem();
         });
     </script>
 </body>

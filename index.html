@@ -24,6 +24,7 @@
             --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
             --glass-bg: rgba(255, 255, 255, 0.95);
             --glass-border: rgba(255, 255, 255, 0.2);
+            --header-height: 80px;
         }
 
         [data-theme="dark"] {
@@ -51,7 +52,6 @@
             transition: all 0.3s ease;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            /* Better touch scrolling */
             -webkit-overflow-scrolling: touch;
             touch-action: manipulation;
         }
@@ -71,6 +71,7 @@
             top: 0;
             z-index: 100;
             padding: 1rem 0;
+            min-height: var(--header-height);
         }
 
         .header-content {
@@ -98,6 +99,7 @@
             position: relative;
             display: flex;
             gap: 0.5rem;
+            align-items: center;
         }
 
         .search-input {
@@ -109,6 +111,7 @@
             font-size: 0.9rem;
             width: 200px;
             transition: all 0.3s ease;
+            text-transform: uppercase;
         }
 
         .search-input:focus {
@@ -150,82 +153,12 @@
             background: var(--surface-elevated);
         }
 
-        /* Dashboard */
-        .dashboard {
-            margin: 2rem 0;
-        }
-
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .dashboard-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            box-shadow: var(--shadow);
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .stat-card h3 {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-card .value {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-card .change {
-            font-size: 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-
-        .change.positive {
-            color: var(--success-color);
-        }
-
-        .change.negative {
-            color: var(--danger-color);
-        }
-
-
-
-        /* Tabs - Sticky Headers */
-        .tabs {
+        /* Course Tabs */
+        .course-section {
             background: var(--surface);
             border-radius: 1rem;
-            overflow: hidden;
             box-shadow: var(--shadow);
+            margin-top: 2rem;
         }
 
         .tab-headers {
@@ -234,9 +167,11 @@
             overflow-x: auto;
             scrollbar-width: none;
             position: sticky;
-            top: 70px; /* Below header */
-            z-index: 50;
+            top: calc(var(--header-height) + 20px);
+            z-index: 90;
             border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem 1rem 0 0;
         }
 
         .tab-headers::-webkit-scrollbar {
@@ -273,7 +208,6 @@
         }
 
         .students-scroll {
-            /* Remove horizontal scrolling from main container */
             overflow-y: visible;
             overflow-x: visible;
         }
@@ -296,7 +230,6 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            /* Add horizontal scroll for the entire card on mobile */
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: thin;
@@ -325,9 +258,8 @@
             box-shadow: var(--shadow-lg);
         }
 
-        /* Card Inner Content - Fixed Width */
         .student-card-inner {
-            min-width: 600px; /* Ensure minimum width for proper display */
+            min-width: 600px;
             width: 100%;
         }
 
@@ -338,7 +270,7 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            min-width: 600px; /* Match inner content width */
+            min-width: 600px;
         }
 
         .student-info {
@@ -419,7 +351,7 @@
             color: white;
         }
 
-        /* Subject Table - Exact Match */
+        /* Subject Table */
         .subjects-table-container {
             flex: 1;
             overflow: auto;
@@ -457,7 +389,6 @@
             background: var(--background);
         }
 
-        /* Column specific styling */
         .subjects-table .col-sem {
             width: 50px;
             text-align: center;
@@ -501,7 +432,6 @@
             font-weight: bold;
         }
 
-        /* Result and Grade styling */
         .result-p {
             color: #059669;
         }
@@ -517,10 +447,6 @@
         .grade-pass {
             color: #059669;
         }
-
-
-
-
 
         /* Modal */
         .modal {
@@ -637,63 +563,78 @@
 
         /* Responsive Design - Mobile First */
         @media (max-width: 768px) {
+            :root {
+                --header-height: auto;
+            }
+
             .container {
                 padding: 0 0.75rem;
             }
 
             .header {
                 padding: 0.75rem 0;
+                min-height: auto;
+                position: sticky;
+                top: 0;
+                z-index: 100;
             }
 
             .header-content {
                 flex-direction: column;
                 gap: 0.75rem;
+                align-items: stretch;
             }
 
             .header-controls {
                 width: 100%;
-                justify-content: center;
-                flex-wrap: wrap;
+                justify-content: space-between;
+                flex-wrap: nowrap;
+                gap: 0.5rem;
             }
 
             .search-container {
-                width: 100%;
-                max-width: 100%;
+                flex: 1;
+                max-width: none;
+                gap: 0.25rem;
             }
 
             .search-input {
                 flex: 1;
                 min-width: 0;
-                font-size: 16px; /* Prevents zoom on iOS */
+                font-size: 16px;
+                width: auto;
             }
 
             .btn {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.85rem;
+                min-height: 40px;
+                white-space: nowrap;
+            }
+
+            .btn-outline {
+                padding: 0.5rem;
+                min-width: 40px;
+            }
+
+            .tab-headers {
+                position: sticky;
+                top: 120px;
+                z-index: 90;
+                margin-top: 1rem;
+            }
+
+            .tab-header {
                 padding: 0.75rem 1rem;
                 font-size: 0.9rem;
-                min-height: 44px; /* Better touch target */
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
 
-            .dashboard-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.5rem;
-            }
-
-            .dashboard-title {
-                font-size: 1.25rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-                gap: 1rem;
-            }
-
-            .stat-card {
-                padding: 1rem;
-            }
-
-            .stat-card .value {
-                font-size: 1.5rem;
+            .tab-content {
+                padding: 1rem 0.75rem;
             }
 
             .students-grid {
@@ -709,11 +650,13 @@
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 0.75rem;
+                min-width: 320px;
             }
 
             .student-badges {
                 margin-left: 0;
                 flex-wrap: wrap;
+                width: 100%;
             }
 
             .student-name {
@@ -735,45 +678,6 @@
                 max-width: 180px;
             }
 
-            .student-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.5rem;
-            }
-
-            .result-badge {
-                align-self: flex-start;
-                padding: 0.375rem 0.75rem;
-                font-size: 0.75rem;
-            }
-
-            .tab-headers {
-                padding: 0;
-            }
-
-            .tab-header {
-                padding: 0.75rem 1rem;
-                font-size: 0.9rem;
-                min-height: 44px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-            .tab-content {
-                padding: 1rem 0.75rem;
-            }
-
-            /* Hide horizontal scroll hint on mobile */
-            .students-container .scroll-hint {
-                display: none;
-            }
-
-            /* Remove any old modal styling conflicts */
-            .modal-content .students-container {
-                margin-top: 0;
-            }
-
             .modal-content {
                 margin: 0.5rem;
                 padding: 1rem;
@@ -787,21 +691,6 @@
                 gap: 0.5rem;
             }
 
-            .subjects-table {
-                font-size: 0.75rem;
-            }
-
-            .subjects-table th,
-            .subjects-table td {
-                padding: 0.375rem 0.25rem;
-                max-width: 80px;
-            }
-
-            .subjects-table .col-subject {
-                max-width: 100px;
-                min-width: 80px;
-            }
-
             .file-upload {
                 padding: 2rem 1rem;
                 margin: 1rem 0;
@@ -809,6 +698,7 @@
 
             .logo {
                 font-size: 1.25rem;
+                text-align: center;
             }
         }
 
@@ -817,21 +707,23 @@
                 padding: 0 0.5rem;
             }
 
-            .stats-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 0.75rem;
+            .header-controls {
+                gap: 0.25rem;
             }
 
-            .stat-card {
-                padding: 0.75rem;
+            .search-input {
+                font-size: 14px;
+                padding: 0.5rem 0.75rem;
             }
 
-            .stat-card h3 {
+            .btn {
+                padding: 0.5rem 0.5rem;
                 font-size: 0.8rem;
+                min-height: 36px;
             }
 
-            .stat-card .value {
-                font-size: 1.25rem;
+            .tab-headers {
+                top: 130px;
             }
 
             .student-card {
@@ -840,6 +732,7 @@
 
             .student-header {
                 padding: 0.75rem;
+                min-width: 300px;
             }
 
             .student-name {
@@ -871,24 +764,8 @@
                 font-size: 0.8rem;
             }
 
-            .subjects-table {
-                font-size: 0.7rem;
-            }
-
-            .subjects-table th,
-            .subjects-table td {
-                padding: 0.25rem 0.125rem;
-                max-width: 60px;
-            }
-
-            .subjects-table .col-subject {
-                max-width: 80px;
-                min-width: 60px;
-            }
-
-            .btn {
-                padding: 0.625rem 0.75rem;
-                font-size: 0.85rem;
+            .logo {
+                font-size: 1.1rem;
             }
         }
 
@@ -905,7 +782,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Additional utility classes */
         .text-center { text-align: center; }
         .mb-1 { margin-bottom: 0.5rem; }
         .mb-2 { margin-bottom: 1rem; }
@@ -917,7 +793,6 @@
             scrollbar-width: thin;
         }
 
-        /* Custom scrollbar for webkit browsers */
         .overflow-x-auto::-webkit-scrollbar {
             height: 6px;
         }
@@ -935,7 +810,6 @@
             background: var(--text-secondary);
         }
 
-        /* Ensure smooth scrolling for the main content */
         .students-container .students-scroll {
             scroll-behavior: smooth;
         }
@@ -946,15 +820,15 @@
     <header class="header">
         <div class="container">
             <div class="header-content">
-                <div class="logo" id="mainTitle">📊 Diploma Results System</div>
+                <div class="logo" id="mainTitle">📊 SMP Results System</div>
                 <div class="header-controls">
                     <div class="search-container">
                         <input type="text" class="search-input" id="searchInput" 
                                placeholder="Search by Reg No or Name..." maxlength="50">
-                        <button class="btn btn-primary" id="searchBtn">🔍 Search</button>
+                        <button class="btn btn-outline" id="clearSearch" title="Clear search">✕</button>
+                        <button class="btn btn-primary" id="searchBtn">🔍</button>
                     </div>
-                    <button class="btn btn-outline" id="themeToggle">🌙</button>
-                    <button class="btn btn-outline" id="toggleStats">📈 Stats</button>
+                    <button class="btn btn-outline theme-toggle-mobile" id="themeToggle">🌙</button>
                 </div>
             </div>
         </div>
@@ -1007,12 +881,10 @@
                     <div class="change positive" id="distinctionPercent">Top Performers</div>
                 </div>
             </div>
-
-
         </section>
 
         <!-- Course Tabs -->
-        <section class="tabs" id="courseTabs" style="display: none;">
+        <section class="course-section" id="courseTabs" style="display: none;">
             <div class="tab-headers" id="tabHeaders">
                 <!-- Dynamic tabs will be inserted here -->
             </div>
@@ -1047,6 +919,7 @@
                 this.currentCourse = null;
                 this.searchTimer = null;
                 this.currentFileName = '';
+                this.headerHeight = 0;
                 
                 this.init();
             }
@@ -1054,19 +927,27 @@
             init() {
                 this.setupEventListeners();
                 this.loadTheme();
+                this.calculateHeaderHeight();
                 this.tryLoadDefaultFile();
+            }
+
+            calculateHeaderHeight() {
+                // Calculate actual header height for proper sticky positioning
+                const header = document.querySelector('.header');
+                if (header) {
+                    this.headerHeight = header.offsetHeight;
+                    document.documentElement.style.setProperty('--calculated-header-height', `${this.headerHeight}px`);
+                }
             }
 
             setupEventListeners() {
                 // Search
                 const searchInput = document.getElementById('searchInput');
                 const searchBtn = document.getElementById('searchBtn');
+                const clearSearch = document.getElementById('clearSearch');
                 
                 searchInput.addEventListener('input', (e) => {
-                    // Auto-uppercase for registration numbers
-                    if (/^[0-9]/.test(e.target.value)) {
-                        e.target.value = e.target.value.toUpperCase();
-                    }
+                    e.target.value = e.target.value.toUpperCase();
                 });
                 
                 searchInput.addEventListener('keypress', (e) => {
@@ -1074,26 +955,31 @@
                 });
                 
                 searchBtn.addEventListener('click', this.performSearch.bind(this));
+                
+                clearSearch.addEventListener('click', () => {
+                    searchInput.value = '';
+                    searchInput.focus();
+                });
 
                 // Theme toggle
                 document.getElementById('themeToggle').addEventListener('click', this.toggleTheme.bind(this));
-
-                // Stats toggle
-                document.getElementById('toggleStats').addEventListener('click', this.toggleStats.bind(this));
 
                 // Modal
                 document.getElementById('closeModal').addEventListener('click', this.closeModal.bind(this));
                 document.getElementById('searchModal').addEventListener('click', (e) => {
                     if (e.target.id === 'searchModal') this.closeModal();
                 });
+
+                // Recalculate header height on resize
+                window.addEventListener('resize', () => {
+                    this.calculateHeaderHeight();
+                });
             }
 
             async tryLoadDefaultFile() {
                 try {
-                    // Show loading state immediately
                     this.showLoading();
                     
-                    // Generate possible filenames to try
                     const currentYear = new Date().getFullYear();
                     const possibleFilenames = this.generatePossibleFilenames(currentYear);
                     
@@ -1119,6 +1005,9 @@
                         this.currentFileName = loadedFileName;
                         this.updateTitle(loadedFileName);
                         await this.processCSV(csvText);
+                        this.renderCourseTabs();
+                        this.hideLoading();
+                        this.showResults();
                         console.log(`✅ Data processed successfully from: ${loadedFileName}`);
                     } else {
                         throw new Error('No CSV files found');
@@ -1127,7 +1016,6 @@
                 } catch (error) {
                     console.log('📁 No default CSV files found');
                     this.hideLoading();
-                    // Show error message instead of file upload
                     this.showNoFileMessage();
                 }
             }
@@ -1145,18 +1033,13 @@
                 
                 const filenames = [];
                 
-                // Try current year and previous year
                 [year, year - 1].forEach(yr => {
-                    // Try both full month names and short month names
                     [...months, ...shortMonths].forEach(month => {
-                        // Regular Results files
                         filenames.push(`Results ${month} ${yr}.csv`);
-                        // Makeup Results files
                         filenames.push(`Results Makeup ${month} ${yr}.csv`);
                     });
                 });
                 
-                // Add some common variations
                 filenames.push(
                     'Results Nov 2025.csv',
                     'Results Makeup Nov 2025.csv',
@@ -1199,17 +1082,12 @@
                         </p>
                     `;
                     
-                    // Insert after loading div
                     const loading = document.getElementById('loading');
                     loading.parentNode.insertBefore(messageDiv, loading.nextSibling);
                 }
             }
 
-
-
             updateTitle(filename) {
-                // Extract month and year from filename patterns:
-                // "Results {Month} {Year}.csv" or "Results Makeup {Month} {Year}.csv"
                 const regularMatch = filename.match(/Results\s+([A-Za-z]{3,})\s+(\d{4})/i);
                 const makeupMatch = filename.match(/Results\s+Makeup\s+([A-Za-z]{3,})\s+(\d{4})/i);
                 
@@ -1220,7 +1098,6 @@
                     const month = match[1];
                     const year = match[2];
                     
-                    // Convert short month to full month name
                     const monthNames = {
                         'jan': 'January', 'feb': 'February', 'mar': 'March',
                         'apr': 'April', 'may': 'May', 'jun': 'June',
@@ -1230,12 +1107,11 @@
                     
                     const fullMonth = monthNames[month.toLowerCase()] || month;
                     const examType = isMarkup ? 'Makeup Examination' : 'Examination';
-                    const title = `📊 Diploma Results - ${fullMonth} ${year} ${examType}`;
+                    const title = `📊 SMP Results - ${fullMonth} ${year} ${examType}`;
                     
                     document.getElementById('mainTitle').textContent = title;
                 } else {
-                    // Fallback title if pattern doesn't match
-                    document.getElementById('mainTitle').textContent = '📊 Diploma Results System';
+                    document.getElementById('mainTitle').textContent = '📊 SMP Results System';
                 }
             }
 
@@ -1249,7 +1125,6 @@
                             try {
                                 this.data = results.data;
                                 this.processData();
-                                this.renderDashboard();
                                 this.renderCourseTabs();
                                 this.hideLoading();
                                 this.showResults();
@@ -1267,7 +1142,6 @@
                 this.students.clear();
                 this.courses.clear();
 
-                // Group by registration number
                 const studentGroups = {};
                 
                 this.data.forEach(row => {
@@ -1300,7 +1174,6 @@
                     }
                 });
 
-                // Convert to Map and group by course
                 Object.values(studentGroups).forEach(student => {
                     this.students.set(student.regNo, student);
                     
@@ -1310,71 +1183,10 @@
                     this.courses.get(student.course).push(student);
                 });
 
-                // Set current course to first available
                 if (this.courses.size > 0) {
                     this.currentCourse = this.courses.keys().next().value;
                 }
             }
-
-            renderDashboard() {
-                const stats = this.calculateStatistics();
-                
-                document.getElementById('totalStudents').textContent = stats.totalStudents;
-                document.getElementById('passRate').textContent = `${stats.passRate}%`;
-                document.getElementById('firstClassCount').textContent = stats.firstClassCount;
-                document.getElementById('distinctionCount').textContent = stats.distinctionCount;
-                
-                document.getElementById('passRateChange').textContent = `${stats.passedStudents}/${stats.totalStudents} passed`;
-                document.getElementById('firstClassPercent').textContent = `${stats.firstClassRate}%`;
-                document.getElementById('distinctionPercent').textContent = `${stats.distinctionRate}%`;
-            }
-
-            calculateStatistics() {
-                const totalStudents = this.students.size;
-                let passedStudents = 0;
-                let firstClassCount = 0;
-                let distinctionCount = 0;
-
-                const courseStats = {};
-
-                this.students.forEach(student => {
-                    const result = student.overallResult;
-                    const course = student.course;
-
-                    if (!courseStats[course]) {
-                        courseStats[course] = { total: 0, passed: 0, failed: 0 };
-                    }
-                    courseStats[course].total++;
-
-                    if (['First Class', 'Second Class', 'Distinction'].includes(result)) {
-                        passedStudents++;
-                        courseStats[course].passed++;
-                    } else if (result === 'FAILS') {
-                        courseStats[course].failed++;
-                    }
-
-                    if (['First Class', 'Distinction'].includes(result)) {
-                        firstClassCount++;
-                    }
-
-                    if (result === 'Distinction') {
-                        distinctionCount++;
-                    }
-                });
-
-                return {
-                    totalStudents,
-                    passedStudents,
-                    passRate: totalStudents > 0 ? Math.round((passedStudents / totalStudents) * 100) : 0,
-                    firstClassCount,
-                    firstClassRate: totalStudents > 0 ? Math.round((firstClassCount / totalStudents) * 100) : 0,
-                    distinctionCount,
-                    distinctionRate: totalStudents > 0 ? Math.round((distinctionCount / totalStudents) * 100) : 0,
-                    courseStats
-                };
-            }
-
-
 
             renderCourseTabs() {
                 const tabHeaders = document.getElementById('tabHeaders');
@@ -1398,11 +1210,9 @@
             }
 
             switchTab(courseCode, tabElement) {
-                // Update active tab
                 document.querySelectorAll('.tab-header').forEach(tab => tab.classList.remove('active'));
                 tabElement.classList.add('active');
                 
-                // Render students for this course
                 this.currentCourse = courseCode;
                 this.renderStudents(courseCode);
             }
@@ -1432,11 +1242,9 @@
             }
 
             renderStudentCard(student) {
-                // Calculate pass/fail counts
                 const passCount = student.subjects.filter(subject => subject.result === 'P').length;
                 const failCount = student.subjects.filter(subject => subject.result === 'F').length;
                 
-                // Determine overall status class
                 const overallStatus = this.getOverallStatus(student.overallResult);
                 const statusClass = this.getOverallStatusClass(student.overallResult);
                 
@@ -1506,7 +1314,6 @@
 
             cleanQPCode(qpCode) {
                 if (!qpCode) return '';
-                // Remove trailing colon if present
                 return qpCode.toString().replace(/:$/, '');
             }
 
@@ -1531,8 +1338,6 @@
                     return 'unknown';
                 }
             }
-
-
 
             performSearch() {
                 const query = document.getElementById('searchInput').value.trim();
@@ -1615,8 +1420,6 @@
                 return courseNames[code] || code;
             }
 
-
-
             toggleTheme() {
                 const currentTheme = document.documentElement.getAttribute('data-theme');
                 const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
@@ -1636,28 +1439,9 @@
                 themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
             }
 
-            toggleStats() {
-                const statsGrid = document.getElementById('statsGrid');
-                const toggleBtn = document.getElementById('toggleStats');
-                const statusEl = document.getElementById('statsStatus');
-                
-                if (statsGrid.style.display === 'none') {
-                    statsGrid.style.display = 'grid';
-                    toggleBtn.textContent = '📈 Hide Stats';
-                    statusEl.textContent = 'Visible';
-                    localStorage.setItem('statsVisible', 'true');
-                } else {
-                    statsGrid.style.display = 'none';
-                    toggleBtn.textContent = '📈 Show Stats';
-                    statusEl.textContent = 'Hidden';
-                    localStorage.setItem('statsVisible', 'false');
-                }
-            }
-
             showLoading() {
                 document.getElementById('fileUpload').style.display = 'none';
                 document.getElementById('loading').style.display = 'block';
-                document.getElementById('dashboard').style.display = 'none';
                 document.getElementById('courseTabs').style.display = 'none';
             }
 
@@ -1666,28 +1450,10 @@
             }
 
             showResults() {
-                document.getElementById('dashboard').style.display = 'block';
                 document.getElementById('courseTabs').style.display = 'block';
-                
-                // Load stats visibility preference
-                const statsVisible = localStorage.getItem('statsVisible') !== 'false';
-                const statsGrid = document.getElementById('statsGrid');
-                const toggleBtn = document.getElementById('toggleStats');
-                const statusEl = document.getElementById('statsStatus');
-                
-                if (!statsVisible) {
-                    statsGrid.style.display = 'none';
-                    toggleBtn.textContent = '📈 Show Stats';
-                    statusEl.textContent = 'Hidden';
-                } else {
-                    statsGrid.style.display = 'grid';
-                    toggleBtn.textContent = '📈 Hide Stats';
-                    statusEl.textContent = 'Visible';
-                }
             }
         }
 
-        // Initialize the application
         document.addEventListener('DOMContentLoaded', () => {
             new DiplomaResultsSystem();
         });

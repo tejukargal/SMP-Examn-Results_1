@@ -1,4 +1,17 @@
-<!DOCTYPE html>
+.student-info {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+
+            .student-info h4 {
+                font-size: 1rem;
+                margin-bottom: 2px;
+            }
+
+            .student-info p {
+                font-size: 0.8rem;
+                line-height: 1.2;
+            }<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -48,61 +61,9 @@
         }
 
         .container {
-            display: flex;
+            width: 100%;
             min-height: 100vh;
-        }
-
-        .sidebar {
-            width: 250px;
-            background: var(--bg-white);
-            backdrop-filter: blur(10px);
-            border-right: 1px solid var(--border-color);
-            padding: 20px;
-            box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .sidebar h2 {
-            color: var(--text-color);
-            margin-bottom: 20px;
-            font-size: 1.2rem;
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
-        }
-
-        .file-list {
-            list-style: none;
-        }
-
-        .file-item {
-            padding: 12px 16px;
-            margin: 8px 0;
-            background: rgba(102, 126, 234, 0.1);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border-left: 4px solid transparent;
-            color: var(--text-color);
-        }
-
-        .file-item:hover {
-            background: rgba(102, 126, 234, 0.2);
-            transform: translateX(5px);
-            border-left-color: var(--primary-color);
-        }
-
-        .file-item.active {
-            background: var(--primary-color);
-            color: white;
-            border-left-color: #4c51bf;
-        }
-
-        .main-content {
-            flex: 1;
-            padding: 0 20px 20px 20px;
-            position: relative;
-            height: 100vh;
-            overflow-y: auto;
+            padding: 0 20px;
         }
 
         .header {
@@ -112,7 +73,6 @@
             border-radius: 0 0 12px 12px;
             margin: 0 0 20px 0;
             box-shadow: var(--shadow);
-            position: -webkit-sticky;
             position: sticky;
             top: 0;
             z-index: 200;
@@ -186,6 +146,43 @@
 
         .search-btn:hover {
             background: #5a67d8;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .loading-content {
+            background: var(--bg-white);
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .spinner {
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .dashboard {
@@ -274,9 +271,8 @@
             border-radius: 12px;
             margin-bottom: 20px;
             box-shadow: var(--shadow);
-            position: -webkit-sticky;
             position: sticky;
-            top: 160px;
+            top: 140px;
             z-index: 150;
             border: 2px solid var(--border-color);
             width: 100%;
@@ -367,9 +363,41 @@
             display: block;
         }
 
-        #tabContents {
-            min-height: 200px;
-            padding-top: 10px;
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0;
+            padding: 20px;
+            background: var(--bg-white);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .pagination-btn {
+            padding: 8px 16px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: #5a67d8;
+        }
+
+        .pagination-btn:disabled {
+            background: var(--border-color);
+            cursor: not-allowed;
+        }
+
+        .pagination-info {
+            color: var(--text-color);
+            font-weight: 600;
+            margin: 0 15px;
         }
 
         .student-card {
@@ -427,17 +455,19 @@
 
         .student-summary {
             display: flex;
-            gap: 15px;
+            gap: 8px;
             align-items: center;
             flex-wrap: wrap;
+            justify-content: flex-start;
         }
 
         .summary-item {
             background: rgba(102, 126, 234, 0.1);
-            padding: 6px 12px;
-            border-radius: 15px;
-            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
             font-weight: 600;
+            white-space: nowrap;
         }
 
         .summary-pass {
@@ -451,11 +481,12 @@
         }
 
         .overall-result {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
             font-weight: 600;
             text-transform: uppercase;
+            white-space: nowrap;
         }
 
         .overall-result.pass {
@@ -499,15 +530,15 @@
             top: 0;
         }
 
-        .subjects-table th:nth-child(1) { width: 60px; }  /* Sem */
-        .subjects-table th:nth-child(2) { width: 100px; } /* QP Code */
-        .subjects-table th:nth-child(3) { width: 250px; } /* Subject */
-        .subjects-table th:nth-child(4) { width: 70px; }  /* IA */
-        .subjects-table th:nth-child(5) { width: 80px; }  /* Theory */
-        .subjects-table th:nth-child(6) { width: 90px; }  /* Practical */
-        .subjects-table th:nth-child(7) { width: 70px; }  /* Result */
-        .subjects-table th:nth-child(8) { width: 70px; }  /* Credit */
-        .subjects-table th:nth-child(9) { width: 70px; }  /* Grade */
+        .subjects-table th:nth-child(1) { width: 60px; }
+        .subjects-table th:nth-child(2) { width: 100px; }
+        .subjects-table th:nth-child(3) { width: 250px; }
+        .subjects-table th:nth-child(4) { width: 70px; }
+        .subjects-table th:nth-child(5) { width: 80px; }
+        .subjects-table th:nth-child(6) { width: 90px; }
+        .subjects-table th:nth-child(7) { width: 70px; }
+        .subjects-table th:nth-child(8) { width: 70px; }
+        .subjects-table th:nth-child(9) { width: 70px; }
 
         .subjects-table td:nth-child(2),
         .subjects-table td:nth-child(3) {
@@ -573,12 +604,6 @@
             color: var(--primary-color);
         }
 
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: var(--text-color);
-        }
-
         .auto-close-notice {
             background: rgba(102, 126, 234, 0.1);
             color: var(--text-color);
@@ -589,25 +614,51 @@
             text-align: center;
         }
 
+        .error-container {
+            background: var(--bg-white);
+            padding: 40px;
+            border-radius: 12px;
+            margin: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .error-message {
+            color: var(--fail-color);
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .retry-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+            display: inline-block;
+        }
+
+        .retry-btn:hover {
+            background: #5a67d8;
+        }
+
+        #selectFileBtn {
+            background: #48bb78;
+        }
+
+        #selectFileBtn:hover {
+            background: #38a169;
+        }
+
         @media (max-width: 768px) {
             .container {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                width: 100%;
-                order: 2;
-            }
-
-            .main-content {
-                order: 1;
-                padding: 0 15px 15px 15px;
-                height: 100vh;
-                overflow-y: auto;
+                padding: 0 15px;
             }
 
             .header {
-                position: -webkit-sticky;
                 position: sticky;
                 top: 0;
                 margin: 0 0 15px 0;
@@ -616,9 +667,8 @@
             }
 
             .course-tabs {
-                position: -webkit-sticky;
                 position: sticky;
-                top: 130px;
+                top: 110px;
                 z-index: 150;
                 margin: 0 0 15px 0;
                 padding: 15px;
@@ -631,6 +681,25 @@
             .student-header {
                 flex-direction: column;
                 align-items: flex-start;
+                gap: 8px;
+            }
+
+            .student-summary {
+                gap: 6px;
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .summary-item {
+                padding: 3px 6px;
+                font-size: 0.65rem;
+                border-radius: 10px;
+            }
+
+            .overall-result {
+                padding: 4px 8px;
+                font-size: 0.65rem;
+                border-radius: 12px;
             }
 
             .tab-buttons {
@@ -643,12 +712,6 @@
                 text-align: center;
             }
 
-            .theme-toggle {
-                position: absolute;
-                top: 20px;
-                right: 20px;
-            }
-
             .subjects-table {
                 font-size: 0.8rem;
                 min-width: 900px;
@@ -658,46 +721,72 @@
                 border-radius: 8px;
                 box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             }
+
+            .pagination-container {
+                flex-wrap: wrap;
+                gap: 5px;
+            }
+
+            .pagination-info {
+                margin: 0 5px;
+                order: -1;
+                width: 100%;
+                text-align: center;
+                margin-bottom: 10px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="sidebar">
-            <h2>Available Results</h2>
-            <ul class="file-list" id="fileList">
-                <li class="loading">Loading files...</li>
-            </ul>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h3 id="loadingTitle">Loading Results Data...</h3>
+            <p id="loadingMessage">Please wait while we process the file</p>
+        </div>
+    </div>
+
+    <div class="container" id="mainContainer" style="display: none;">
+        <div class="header">
+            <button class="theme-toggle" id="themeToggle">🌓</button>
+            <h1 id="pageTitle">Diploma Results Management System</h1>
+            <div class="search-container">
+                <input type="text" class="search-input" id="searchInput" 
+                       placeholder="Search by Registration Number or Student Name...">
+                <button class="search-btn" id="searchBtn">Search</button>
+            </div>
         </div>
 
-        <div class="main-content">
-            <div class="header">
-                <button class="theme-toggle" id="themeToggle">🌓</button>
-                <h1 id="pageTitle">Diploma Results Management System</h1>
-                <div class="search-container">
-                    <input type="text" class="search-input" id="searchInput" 
-                           placeholder="Search by Registration Number or Student Name...">
-                    <button class="search-btn" id="searchBtn">Search</button>
-                </div>
+        <div class="dashboard" id="dashboard">
+            <div class="dashboard-header">
+                <h2>Course-wise Statistics</h2>
+                <button class="toggle-stats" id="toggleStats">Hide Statistics</button>
             </div>
-
-            <div class="dashboard" id="dashboard">
-                <div class="dashboard-header">
-                    <h2>Course-wise Statistics</h2>
-                    <button class="toggle-stats" id="toggleStats">Hide Statistics</button>
-                </div>
-                <div class="dashboard-content" id="dashboardContent">
-                    <p class="loading">Please load a results file to view statistics</p>
-                </div>
+            <div class="dashboard-content" id="dashboardContent">
+                <p class="loading">Processing data...</p>
             </div>
-
-            <div class="course-tabs" id="courseTabs">
-                <h2>Student Results by Course</h2>
-                <div class="tab-buttons" id="tabButtons"></div>
-            </div>
-
-            <div id="tabContents"></div>
         </div>
+
+        <div class="course-tabs" id="courseTabs">
+            <h2>Student Results by Course</h2>
+            <div class="tab-buttons" id="tabButtons"></div>
+        </div>
+
+        <div id="tabContents"></div>
+    </div>
+
+    <div class="error-container" id="errorContainer" style="display: none;">
+        <div class="error-message" id="errorMessage">
+            Failed to load results file. Please ensure 'results.csv' is available.
+        </div>
+        <div style="margin: 20px 0;">
+            <input type="file" id="fileInput" accept=".csv" style="display: none;">
+            <button class="retry-btn" id="selectFileBtn">Select CSV File</button>
+            <button class="retry-btn" id="retryBtn" style="margin-left: 10px;">Retry Auto-Load</button>
+        </div>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 15px;">
+            You can either place 'results.csv' in the same folder as this HTML file, or manually select your CSV file using the button above.
+        </p>
     </div>
 
     <!-- Search Results Modal -->
@@ -713,15 +802,700 @@
     </div>
 
     <script>
-        class ResultsApp {
+        class OptimizedResultsApp {
             constructor() {
-                this.resultsData = new Map();
-                this.currentFile = null;
                 this.currentData = [];
+                this.studentsByRegNo = new Map();
+                this.studentsByCourse = new Map();
                 this.searchTimer = null;
                 this.countdownTimer = null;
+                this.currentPage = 1;
+                this.itemsPerPage = 20;
+                this.currentCourse = null;
+                this.searchDebounceTimer = null;
+                
                 this.courseNames = {
                     'CE': 'Civil Engineering',
                     'CS': 'Computer Science',
                     'EE': 'Electrical Engineering',
                     'ME': 'Mechanical Engineering',
+                    'EC': 'Electronics & Communication'
+                };
+                
+                this.isDarkMode = localStorage.getItem('darkMode') === 'true';
+                this.statsVisible = localStorage.getItem('statsVisible') !== 'false';
+                
+                this.init();
+            }
+
+            async init() {
+                this.setupEventListeners();
+                this.applyTheme();
+                this.updateStatsVisibility();
+                await this.loadResultsFile();
+            }
+
+            setupEventListeners() {
+                document.getElementById('searchBtn').addEventListener('click', () => {
+                    this.performSearch();
+                });
+
+                document.getElementById('searchInput').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.performSearch();
+                    }
+                });
+
+                document.getElementById('searchInput').addEventListener('input', (e) => {
+                    e.target.value = e.target.value.toUpperCase();
+                    
+                    // Debounced search
+                    clearTimeout(this.searchDebounceTimer);
+                    this.searchDebounceTimer = setTimeout(() => {
+                        if (e.target.value.length > 2) {
+                            this.performSearch();
+                        }
+                    }, 500);
+                });
+
+                document.getElementById('themeToggle').addEventListener('click', () => {
+                    this.toggleTheme();
+                });
+
+                document.getElementById('toggleStats').addEventListener('click', () => {
+                    this.toggleStats();
+                });
+
+                document.getElementById('closeModal').addEventListener('click', () => {
+                    this.closeSearchModal();
+                });
+
+                document.getElementById('retryBtn').addEventListener('click', () => {
+                    this.loadResultsFile();
+                });
+
+                document.getElementById('selectFileBtn').addEventListener('click', () => {
+                    document.getElementById('fileInput').click();
+                });
+
+                document.getElementById('fileInput').addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file && file.type === 'text/csv') {
+                        this.loadLocalFile(file);
+                    } else {
+                        alert('Please select a valid CSV file.');
+                    }
+                });
+
+                window.addEventListener('click', (e) => {
+                    const modal = document.getElementById('searchModal');
+                    if (e.target === modal) {
+                        this.closeSearchModal();
+                    }
+                });
+            }
+
+            toggleTheme() {
+                this.isDarkMode = !this.isDarkMode;
+                localStorage.setItem('darkMode', this.isDarkMode);
+                this.applyTheme();
+            }
+
+            applyTheme() {
+                document.documentElement.setAttribute('data-theme', this.isDarkMode ? 'dark' : 'light');
+                document.getElementById('themeToggle').textContent = this.isDarkMode ? '☀️' : '🌙';
+            }
+
+            toggleStats() {
+                this.statsVisible = !this.statsVisible;
+                localStorage.setItem('statsVisible', this.statsVisible);
+                this.updateStatsVisibility();
+            }
+
+            updateStatsVisibility() {
+                const content = document.getElementById('dashboardContent');
+                const button = document.getElementById('toggleStats');
+                
+                if (this.statsVisible) {
+                    content.classList.remove('hidden');
+                    button.textContent = 'Hide Statistics';
+                } else {
+                    content.classList.add('hidden');
+                    button.textContent = 'Show Statistics';
+                }
+            }
+
+            async loadResultsFile() {
+                const possibleFiles = ['results.csv', 'Results.csv', 'RESULTS.CSV', 'data.csv', 'Data.csv'];
+                
+                try {
+                    this.showLoading('Searching for CSV files...', 'Looking for results.csv and other common file names...');
+
+                    for (const filename of possibleFiles) {
+                        try {
+                            const response = await fetch(filename);
+                            if (response.ok) {
+                                const csvText = await response.text();
+                                if (csvText.trim()) {
+                                    this.parseCSVFile(csvText);
+                                    return;
+                                }
+                            }
+                        } catch (err) {
+                            console.log(`File ${filename} not found`);
+                        }
+                    }
+                    
+                    throw new Error('No CSV files found');
+                    
+                } catch (error) {
+                    console.error('Error loading file:', error);
+                    this.showError('No CSV file found. Please select a file manually or ensure your CSV file is named "results.csv" and placed in the same directory.');
+                }
+            }
+
+            loadLocalFile(file) {
+                try {
+                    this.showLoading('Reading Selected File...', `Processing ${file.name}...`);
+
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const csvText = e.target.result;
+                        this.parseCSVFile(csvText);
+                    };
+                    reader.onerror = () => {
+                        this.showError('Failed to read the selected file. Please try again.');
+                    };
+                    reader.readAsText(file);
+                } catch (error) {
+                    console.error('Error reading local file:', error);
+                    this.showError('Failed to process the selected file. Please ensure it\'s a valid CSV file.');
+                }
+            }
+
+            showLoading(title, message) {
+                document.getElementById('loadingTitle').textContent = title;
+                document.getElementById('loadingMessage').textContent = message;
+                document.getElementById('loadingOverlay').style.display = 'flex';
+                document.getElementById('mainContainer').style.display = 'none';
+                document.getElementById('errorContainer').style.display = 'none';
+            }
+
+            parseCSVFile(csvText) {
+                if (!csvText || csvText.trim().length === 0) {
+                    this.showError('The CSV file appears to be empty. Please check your file.');
+                    return;
+                }
+
+                this.showLoading('Processing CSV Data...', 'Parsing and organizing student records...');
+
+                Papa.parse(csvText, {
+                    header: true,
+                    dynamicTyping: true,
+                    skipEmptyLines: true,
+                    worker: true, // Use web worker for large files
+                    complete: (results) => {
+                        if (results.errors && results.errors.length > 0) {
+                            console.warn('CSV parsing warnings:', results.errors);
+                        }
+                        
+                        if (!results.data || results.data.length === 0) {
+                            this.showError('No valid data found in the CSV file. Please check your file format.');
+                            return;
+                        }
+
+                        // Validate required columns
+                        const firstRow = results.data[0];
+                        const requiredColumns = ['Reg_No', 'Student_Name', 'Course_Code'];
+                        const missingColumns = requiredColumns.filter(col => !(col in firstRow));
+                        
+                        if (missingColumns.length > 0) {
+                            this.showError(`Missing required columns: ${missingColumns.join(', ')}. Please check your CSV format.`);
+                            return;
+                        }
+
+                        this.currentData = results.data;
+                        this.showLoading('Organizing Data...', `Processing ${results.data.length} records...`);
+                        
+                        // Use setTimeout to allow UI to update
+                        setTimeout(() => {
+                            this.processData();
+                            this.hideLoading();
+                            this.generateDashboard();
+                            this.generateCourseTabs();
+                        }, 100);
+                    },
+                    error: (error) => {
+                        console.error('Parse error:', error);
+                        this.showError('Failed to parse CSV file. Please check the file format and ensure it\'s a valid CSV file.');
+                    }
+                });
+            }
+
+            processData() {
+                // Clear existing data
+                this.studentsByRegNo.clear();
+                this.studentsByCourse.clear();
+
+                // Group by registration number using Map for better performance
+                this.currentData.forEach(row => {
+                    const regNo = row.Reg_No;
+                    if (!this.studentsByRegNo.has(regNo)) {
+                        this.studentsByRegNo.set(regNo, []);
+                    }
+                    this.studentsByRegNo.get(regNo).push(row);
+                });
+
+                // Group by course
+                for (const [regNo, studentData] of this.studentsByRegNo) {
+                    const course = studentData[0].Course_Code;
+                    if (!this.studentsByCourse.has(course)) {
+                        this.studentsByCourse.set(course, []);
+                    }
+                    this.studentsByCourse.get(course).push({ regNo, data: studentData });
+                }
+            }
+
+            hideLoading() {
+                document.getElementById('loadingOverlay').style.display = 'none';
+                document.getElementById('mainContainer').style.display = 'block';
+            }
+
+            showError(message) {
+                document.getElementById('loadingOverlay').style.display = 'none';
+                document.getElementById('mainContainer').style.display = 'none';
+                document.getElementById('errorContainer').style.display = 'block';
+                document.getElementById('errorMessage').textContent = message;
+            }
+
+            generateDashboard() {
+                const courseStats = this.calculateCourseStats();
+                const dashboardContent = document.getElementById('dashboardContent');
+
+                const fragment = document.createDocumentFragment();
+                
+                // Create table
+                const table = document.createElement('table');
+                table.className = 'stats-table';
+                
+                table.innerHTML = `
+                    <thead>
+                        <tr>
+                            <th>Course</th>
+                            <th>Total Students</th>
+                            <th>Passed</th>
+                            <th>Failed</th>
+                            <th>First Class</th>
+                            <th>Distinction</th>
+                            <th>Pass %</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                `;
+
+                const tbody = table.querySelector('tbody');
+
+                for (const [course, stats] of courseStats) {
+                    const passPercentage = ((stats.passed / stats.total) * 100).toFixed(1);
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><strong>${this.courseNames[course] || course}</strong></td>
+                        <td>${stats.total}</td>
+                        <td style="color: var(--pass-color);">${stats.passed}</td>
+                        <td style="color: var(--fail-color);">${stats.failed}</td>
+                        <td style="color: #2b6cb0;">${stats.firstClass}</td>
+                        <td style="color: #805ad5;">${stats.distinction}</td>
+                        <td><strong>${passPercentage}%</strong></td>
+                    `;
+                    tbody.appendChild(row);
+                }
+
+                fragment.appendChild(table);
+
+                // Create chart container
+                const chartContainer = document.createElement('div');
+                chartContainer.className = 'chart-container';
+                chartContainer.innerHTML = '<canvas id="statsChart"></canvas>';
+                fragment.appendChild(chartContainer);
+
+                dashboardContent.innerHTML = '';
+                dashboardContent.appendChild(fragment);
+                
+                if (this.statsVisible) {
+                    requestAnimationFrame(() => this.createChart(courseStats));
+                }
+            }
+
+            calculateCourseStats() {
+                const courseStats = new Map();
+
+                for (const [regNo, studentData] of this.studentsByRegNo) {
+                    const course = studentData[0].Course_Code;
+                    const overallResult = studentData[0].Overall_Result;
+
+                    if (!courseStats.has(course)) {
+                        courseStats.set(course, {
+                            total: 0,
+                            passed: 0,
+                            failed: 0,
+                            firstClass: 0,
+                            distinction: 0
+                        });
+                    }
+
+                    const stats = courseStats.get(course);
+                    stats.total++;
+
+                    if (overallResult === 'FAILS') {
+                        stats.failed++;
+                    } else {
+                        stats.passed++;
+                        if (overallResult.includes('First Class')) {
+                            stats.firstClass++;
+                        }
+                        if (overallResult.includes('Distinction')) {
+                            stats.distinction++;
+                        }
+                    }
+                }
+
+                return courseStats;
+            }
+
+            createChart(courseStats) {
+                const canvas = document.getElementById('statsChart');
+                if (!canvas) return;
+                
+                const ctx = canvas.getContext('2d');
+                
+                const courses = Array.from(courseStats.keys()).map(course => this.courseNames[course] || course);
+                const passedData = Array.from(courseStats.values()).map(stats => stats.passed);
+                const failedData = Array.from(courseStats.values()).map(stats => stats.failed);
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: courses,
+                        datasets: [
+                            {
+                                label: 'Passed',
+                                data: passedData,
+                                backgroundColor: 'rgba(72, 187, 120, 0.8)',
+                                borderColor: 'rgba(72, 187, 120, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Failed',
+                                data: failedData,
+                                backgroundColor: 'rgba(245, 101, 101, 0.8)',
+                                borderColor: 'rgba(245, 101, 101, 1)',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Number of Students'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Courses'
+                                }
+                            }
+                        },
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Course-wise Pass/Fail Statistics'
+                            },
+                            legend: {
+                                display: true
+                            }
+                        }
+                    }
+                });
+            }
+
+            generateCourseTabs() {
+                const tabButtons = document.getElementById('tabButtons');
+                const tabContents = document.getElementById('tabContents');
+                
+                const buttonFragment = document.createDocumentFragment();
+                const contentFragment = document.createDocumentFragment();
+
+                let isFirst = true;
+                for (const [course, students] of this.studentsByCourse) {
+                    // Create tab button
+                    const tabButton = document.createElement('div');
+                    tabButton.className = `tab-button ${isFirst ? 'active' : ''}`;
+                    tabButton.innerHTML = `
+                        <div class="course-name">${this.courseNames[course] || course}</div>
+                        <div class="student-count">${students.length} Students</div>
+                    `;
+                    tabButton.addEventListener('click', () => this.switchTab(course));
+                    buttonFragment.appendChild(tabButton);
+
+                    // Create tab content
+                    const tabContent = document.createElement('div');
+                    tabContent.className = `tab-content ${isFirst ? 'active' : ''}`;
+                    tabContent.id = `tab-${course}`;
+                    contentFragment.appendChild(tabContent);
+
+                    if (isFirst) {
+                        this.currentCourse = course;
+                        this.currentPage = 1;
+                        this.renderStudentPage(course, 1);
+                    }
+
+                    isFirst = false;
+                }
+
+                tabButtons.innerHTML = '';
+                tabContents.innerHTML = '';
+                tabButtons.appendChild(buttonFragment);
+                tabContents.appendChild(contentFragment);
+            }
+
+            switchTab(courseCode) {
+                // Remove active class from all buttons and contents
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+                // Add active class to clicked button and corresponding content
+                event.target.closest('.tab-button').classList.add('active');
+                document.getElementById(`tab-${courseCode}`).classList.add('active');
+
+                // Load students for this course
+                this.currentCourse = courseCode;
+                this.currentPage = 1;
+                this.renderStudentPage(courseCode, 1);
+            }
+
+            renderStudentPage(courseCode, page) {
+                const students = this.studentsByCourse.get(courseCode) || [];
+                const totalPages = Math.ceil(students.length / this.itemsPerPage);
+                const startIndex = (page - 1) * this.itemsPerPage;
+                const endIndex = startIndex + this.itemsPerPage;
+                const pageStudents = students.slice(startIndex, endIndex);
+
+                const tabContent = document.getElementById(`tab-${courseCode}`);
+                if (!tabContent) return;
+
+                const fragment = document.createDocumentFragment();
+
+                // Add pagination controls
+                const paginationContainer = document.createElement('div');
+                paginationContainer.className = 'pagination-container';
+                paginationContainer.innerHTML = `
+                    <button class="pagination-btn" id="prevBtn-${courseCode}" ${page <= 1 ? 'disabled' : ''}>
+                        Previous
+                    </button>
+                    <span class="pagination-info">
+                        Page ${page} of ${totalPages} (${students.length} total students)
+                    </span>
+                    <button class="pagination-btn" id="nextBtn-${courseCode}" ${page >= totalPages ? 'disabled' : ''}>
+                        Next
+                    </button>
+                `;
+                fragment.appendChild(paginationContainer);
+
+                // Add event listeners for pagination
+                setTimeout(() => {
+                    const prevBtn = document.getElementById(`prevBtn-${courseCode}`);
+                    const nextBtn = document.getElementById(`nextBtn-${courseCode}`);
+                    
+                    if (prevBtn) {
+                        prevBtn.addEventListener('click', () => {
+                            if (page > 1) {
+                                this.currentPage = page - 1;
+                                this.renderStudentPage(courseCode, this.currentPage);
+                            }
+                        });
+                    }
+                    
+                    if (nextBtn) {
+                        nextBtn.addEventListener('click', () => {
+                            if (page < totalPages) {
+                                this.currentPage = page + 1;
+                                this.renderStudentPage(courseCode, this.currentPage);
+                            }
+                        });
+                    }
+                }, 0);
+
+                // Add student cards for current page
+                pageStudents.forEach(student => {
+                    const cardDiv = document.createElement('div');
+                    cardDiv.innerHTML = this.generateStudentCard(student.regNo, student.data);
+                    fragment.appendChild(cardDiv.firstElementChild);
+                });
+
+                tabContent.innerHTML = '';
+                tabContent.appendChild(fragment);
+            }
+
+            generateStudentCard(regNo, studentData) {
+                const firstRecord = studentData[0];
+                const overallResult = firstRecord.Overall_Result;
+                const isPassed = overallResult !== 'FAILS';
+                const summary = this.calculateStudentSummary(studentData);
+
+                return `
+                    <div class="student-card ${isPassed ? 'pass' : 'fail'}">
+                        <div class="student-header">
+                            <div class="student-info">
+                                <h4>${firstRecord.Student_Name}</h4>
+                                <p><span class="reg-no">Reg No: ${regNo}</span> | <span class="father-name">Father: ${firstRecord.Father_Name}</span></p>
+                            </div>
+                            <div class="student-summary">
+                                <div class="summary-item summary-pass">Passed: ${summary.passed}</div>
+                                <div class="summary-item summary-fail">Failed: ${summary.failed}</div>
+                                <div class="overall-result ${isPassed ? 'pass' : 'fail'}">
+                                    ${overallResult}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <table class="subjects-table">
+                                <thead>
+                                    <tr>
+                                        <th>Sem</th>
+                                        <th>QP Code</th>
+                                        <th>Subject</th>
+                                        <th>IA</th>
+                                        <th>Theory</th>
+                                        <th>Practical</th>
+                                        <th>Result</th>
+                                        <th>Credit</th>
+                                        <th>Grade</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${studentData.map(subject => `
+                                        <tr>
+                                            <td>${subject.Semester}</td>
+                                            <td>${subject.QP_Code ? subject.QP_Code.replace(':', '') : '--'}</td>
+                                            <td>${subject.Subject_Name}</td>
+                                            <td>${subject.IA || '--'}</td>
+                                            <td>${subject.Tr || '--'}</td>
+                                            <td>${subject.Pr || '--'}</td>
+                                            <td class="${subject.Result === 'P' ? 'result-pass' : 'result-fail'}">${subject.Result}</td>
+                                            <td>${subject.Credit}</td>
+                                            <td>${subject.Grade}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            }
+
+            calculateStudentSummary(studentData) {
+                let passed = 0;
+                let failed = 0;
+                
+                studentData.forEach(subject => {
+                    if (subject.Result === 'P') {
+                        passed++;
+                    } else {
+                        failed++;
+                    }
+                });
+
+                return { passed, failed };
+            }
+
+            performSearch() {
+                const searchTerm = document.getElementById('searchInput').value.trim();
+                if (!searchTerm) return;
+
+                const searchResults = [];
+
+                for (const [regNo, studentData] of this.studentsByRegNo) {
+                    const student = studentData[0];
+                    if (regNo.toUpperCase().includes(searchTerm) || 
+                        student.Student_Name.toUpperCase().includes(searchTerm)) {
+                        searchResults.push({ regNo, data: studentData });
+                    }
+                }
+
+                this.displaySearchResults(searchResults, searchTerm);
+            }
+
+            displaySearchResults(results, searchTerm) {
+                const modal = document.getElementById('searchModal');
+                const searchResults = document.getElementById('searchResults');
+
+                if (results.length === 0) {
+                    searchResults.innerHTML = `<p>No results found for "${searchTerm}"</p>`;
+                } else {
+                    const fragment = document.createDocumentFragment();
+                    const resultInfo = document.createElement('p');
+                    resultInfo.innerHTML = `<strong>${results.length} result(s) found for "${searchTerm}":</strong>`;
+                    fragment.appendChild(resultInfo);
+
+                    results.forEach(student => {
+                        const cardDiv = document.createElement('div');
+                        cardDiv.innerHTML = this.generateStudentCard(student.regNo, student.data);
+                        fragment.appendChild(cardDiv.firstElementChild);
+                    });
+
+                    searchResults.innerHTML = '';
+                    searchResults.appendChild(fragment);
+                }
+
+                modal.style.display = 'block';
+                this.startAutoCloseTimer();
+            }
+
+            startAutoCloseTimer() {
+                let countdown = 10;
+                const countdownElement = document.getElementById('countdown');
+                
+                if (this.searchTimer) clearTimeout(this.searchTimer);
+                if (this.countdownTimer) clearInterval(this.countdownTimer);
+
+                this.countdownTimer = setInterval(() => {
+                    countdown--;
+                    countdownElement.textContent = countdown;
+                    
+                    if (countdown <= 0) {
+                        clearInterval(this.countdownTimer);
+                        this.closeSearchModal();
+                    }
+                }, 1000);
+
+                this.searchTimer = setTimeout(() => {
+                    this.closeSearchModal();
+                }, 10000);
+            }
+
+            closeSearchModal() {
+                document.getElementById('searchModal').style.display = 'none';
+                if (this.searchTimer) {
+                    clearTimeout(this.searchTimer);
+                    this.searchTimer = null;
+                }
+                if (this.countdownTimer) {
+                    clearInterval(this.countdownTimer);
+                    this.countdownTimer = null;
+                }
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            new OptimizedResultsApp();
+        });
+    </script>
+</body>
+</html>

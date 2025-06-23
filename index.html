@@ -220,7 +220,7 @@
 
 
 
-        /* Tabs */
+        /* Tabs - Sticky Headers */
         .tabs {
             background: var(--surface);
             border-radius: 1rem;
@@ -233,6 +233,10 @@
             background: var(--surface-elevated);
             overflow-x: auto;
             scrollbar-width: none;
+            position: sticky;
+            top: 70px; /* Below header */
+            z-index: 50;
+            border-bottom: 1px solid var(--border);
         }
 
         .tab-headers::-webkit-scrollbar {
@@ -263,55 +267,57 @@
             min-height: 400px;
         }
 
-        /* Student Cards - Horizontal Layout */
+        /* Students Container - Vertical Layout */
         .students-container {
             margin-top: 1rem;
         }
 
         .students-scroll {
-            overflow-x: auto;
-            overflow-y: hidden;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: thin;
-            padding-bottom: 1rem;
-        }
-
-        .students-scroll::-webkit-scrollbar {
-            height: 8px;
-        }
-
-        .students-scroll::-webkit-scrollbar-track {
-            background: var(--background);
-            border-radius: 4px;
-        }
-
-        .students-scroll::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 4px;
-        }
-
-        .students-scroll::-webkit-scrollbar-thumb:hover {
-            background: var(--text-secondary);
+            /* Remove horizontal scrolling from main container */
+            overflow-y: visible;
+            overflow-x: visible;
         }
 
         .students-grid {
             display: flex;
+            flex-direction: column;
             gap: 1.5rem;
             padding: 0.5rem 0;
-            min-height: 400px;
         }
 
+        /* Individual Student Card with Horizontal Scroll */
         .student-card {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 1rem;
-            padding: 1.5rem;
+            border-radius: 0.5rem;
             box-shadow: var(--shadow);
             transition: all 0.3s ease;
-            min-width: 400px;
-            flex-shrink: 0;
+            width: 100%;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
+            /* Add horizontal scroll for the entire card on mobile */
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+        }
+
+        .student-card::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .student-card::-webkit-scrollbar-track {
+            background: var(--background);
+            border-radius: 3px;
+        }
+
+        .student-card::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        .student-card::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
         }
 
         .student-card:hover {
@@ -319,12 +325,20 @@
             box-shadow: var(--shadow-lg);
         }
 
+        /* Card Inner Content - Fixed Width */
+        .student-card-inner {
+            min-width: 600px; /* Ensure minimum width for proper display */
+            width: 100%;
+        }
+
         .student-header {
+            padding: 1rem 1.5rem;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 1rem;
-            flex-shrink: 0;
+            min-width: 600px; /* Match inner content width */
         }
 
         .student-info {
@@ -332,110 +346,181 @@
             min-width: 0;
         }
 
-        .student-info h4 {
-            font-size: 1.1rem;
+        .student-name {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--text-primary);
             margin-bottom: 0.25rem;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        .student-info p {
+        .student-details {
             color: var(--text-secondary);
             font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .student-details div {
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            margin-bottom: 0.1rem;
         }
 
-        .result-badge {
+        .student-badges {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-shrink: 0;
+            margin-left: 1rem;
+        }
+
+        .badge {
             padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
+            border-radius: 0.25rem;
             font-size: 0.8rem;
             font-weight: 600;
-            text-transform: uppercase;
+            white-space: nowrap;
         }
 
-        .result-badge.distinction {
-            background: rgba(168, 85, 247, 0.1);
-            color: #a855f7;
-        }
-
-        .result-badge.first-class {
-            background: rgba(16, 185, 129, 0.1);
+        .badge-passed {
+            background: rgba(16, 185, 129, 0.15);
             color: var(--success-color);
+            border: 1px solid rgba(16, 185, 129, 0.2);
         }
 
-        .result-badge.second-class {
-            background: rgba(245, 158, 11, 0.1);
-            color: var(--warning-color);
-        }
-
-        .result-badge.fails {
-            background: rgba(239, 68, 68, 0.1);
+        .badge-failed {
+            background: rgba(239, 68, 68, 0.15);
             color: var(--danger-color);
+            border: 1px solid rgba(239, 68, 68, 0.2);
         }
 
-        .result-badge.unknown {
-            background: rgba(100, 116, 139, 0.1);
-            color: var(--text-secondary);
+        .badge-status {
+            padding: 0.375rem 1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
         }
 
-        /* Subject Table */
+        .badge-status.pass {
+            background: #10b981;
+            color: white;
+        }
+
+        .badge-status.fail {
+            background: #ef4444;
+            color: white;
+        }
+
+        .badge-status.unknown {
+            background: #6b7280;
+            color: white;
+        }
+
+        /* Subject Table - Exact Match */
+        .subjects-table-container {
+            flex: 1;
+            overflow: auto;
+        }
+
         .subjects-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 1rem;
             font-size: 0.9rem;
-            flex: 1;
-        }
-
-        .subjects-table th,
-        .subjects-table td {
-            padding: 0.5rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 120px;
-        }
-
-        .subjects-table th:nth-child(2),
-        .subjects-table td:nth-child(2) {
-            max-width: 150px;
-            min-width: 120px;
+            background: var(--surface);
         }
 
         .subjects-table th {
             background: var(--surface-elevated);
+            color: var(--text-primary);
             font-weight: 600;
-            color: var(--text-secondary);
-            position: sticky;
-            top: 0;
+            padding: 0.75rem 0.5rem;
+            text-align: left;
+            border-bottom: 2px solid var(--border);
+            white-space: nowrap;
+            font-size: 0.85rem;
         }
 
-        .subjects-table tr:hover {
+        .subjects-table td {
+            padding: 0.75rem 0.5rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .subjects-table tbody tr:hover {
             background: var(--background);
         }
 
-        .grade {
-            font-weight: 600;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
+        /* Column specific styling */
+        .subjects-table .col-sem {
+            width: 50px;
+            text-align: center;
+        }
+
+        .subjects-table .col-qp {
+            width: 80px;
+            font-family: monospace;
             font-size: 0.8rem;
         }
 
-        .grade.pass {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success-color);
+        .subjects-table .col-subject {
+            min-width: 220px;
+            max-width: 300px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .grade.fail {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger-color);
+        .subjects-table .col-ia,
+        .subjects-table .col-theory,
+        .subjects-table .col-practical {
+            width: 60px;
+            text-align: center;
         }
+
+        .subjects-table .col-result {
+            width: 60px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .subjects-table .col-credit {
+            width: 60px;
+            text-align: center;
+        }
+
+        .subjects-table .col-grade {
+            width: 60px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* Result and Grade styling */
+        .result-p {
+            color: #059669;
+        }
+
+        .result-f {
+            color: #dc2626;
+        }
+
+        .grade-f {
+            color: #dc2626;
+        }
+
+        .grade-pass {
+            color: #059669;
+        }
+
+
+
+
 
         /* Modal */
         .modal {
@@ -616,16 +701,38 @@
             }
 
             .student-card {
-                min-width: 300px;
-                padding: 1rem;
+                min-width: 320px;
             }
 
-            .student-info h4 {
-                font-size: 1rem;
+            .student-header {
+                padding: 0.75rem 1rem;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
             }
 
-            .student-info p {
+            .student-badges {
+                margin-left: 0;
+                flex-wrap: wrap;
+            }
+
+            .student-name {
+                font-size: 1.1rem;
+            }
+
+            .student-details {
                 font-size: 0.85rem;
+            }
+
+            .subjects-table th,
+            .subjects-table td {
+                padding: 0.5rem 0.25rem;
+                font-size: 0.8rem;
+            }
+
+            .subjects-table .col-subject {
+                min-width: 150px;
+                max-width: 180px;
             }
 
             .student-header {
@@ -658,8 +765,13 @@
             }
 
             /* Hide horizontal scroll hint on mobile */
-            .students-container > div:first-child span:last-child {
+            .students-container .scroll-hint {
                 display: none;
+            }
+
+            /* Remove any old modal styling conflicts */
+            .modal-content .students-container {
+                margin-top: 0;
             }
 
             .modal-content {
@@ -685,16 +797,9 @@
                 max-width: 80px;
             }
 
-            .subjects-table th:nth-child(2),
-            .subjects-table td:nth-child(2) {
+            .subjects-table .col-subject {
                 max-width: 100px;
                 min-width: 80px;
-            }
-
-            .subjects-table th:first-child,
-            .subjects-table td:first-child {
-                min-width: 30px;
-                max-width: 30px;
             }
 
             .file-upload {
@@ -730,16 +835,35 @@
             }
 
             .student-card {
-                min-width: 280px;
+                min-width: 300px;
+            }
+
+            .student-header {
                 padding: 0.75rem;
             }
 
-            .student-info h4 {
-                font-size: 0.95rem;
+            .student-name {
+                font-size: 1rem;
             }
 
-            .student-info p {
+            .student-details {
                 font-size: 0.8rem;
+            }
+
+            .badge {
+                font-size: 0.75rem;
+                padding: 0.2rem 0.5rem;
+            }
+
+            .subjects-table th,
+            .subjects-table td {
+                padding: 0.4rem 0.2rem;
+                font-size: 0.75rem;
+            }
+
+            .subjects-table .col-subject {
+                min-width: 120px;
+                max-width: 150px;
             }
 
             .tab-header {
@@ -757,8 +881,7 @@
                 max-width: 60px;
             }
 
-            .subjects-table th:nth-child(2),
-            .subjects-table td:nth-child(2) {
+            .subjects-table .col-subject {
                 max-width: 80px;
                 min-width: 60px;
             }
@@ -811,6 +934,11 @@
         .overflow-x-auto::-webkit-scrollbar-thumb:hover {
             background: var(--text-secondary);
         }
+
+        /* Ensure smooth scrolling for the main content */
+        .students-container .students-scroll {
+            scroll-behavior: smooth;
+        }
     </style>
 </head>
 <body>
@@ -833,11 +961,11 @@
     </header>
 
     <main class="container">
-        <!-- File Upload Area -->
-        <div class="file-upload" id="fileUpload">
+        <!-- File Upload Area - Hidden -->
+        <div class="file-upload hidden" id="fileUpload">
             <div>📁 Drop your CSV file here or click to upload</div>
             <div style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">
-                Supports: results.csv, Results Nov 2025.csv
+                Supports: Results [Month] [Year].csv, Results Makeup [Month] [Year].csv
             </div>
             <input type="file" class="file-input" id="csvFile" accept=".csv">
         </div>
@@ -930,15 +1058,6 @@
             }
 
             setupEventListeners() {
-                // File upload
-                const fileUpload = document.getElementById('fileUpload');
-                const csvFile = document.getElementById('csvFile');
-
-                fileUpload.addEventListener('click', () => csvFile.click());
-                fileUpload.addEventListener('dragover', this.handleDragOver.bind(this));
-                fileUpload.addEventListener('drop', this.handleDrop.bind(this));
-                csvFile.addEventListener('change', this.handleFileSelect.bind(this));
-
                 // Search
                 const searchInput = document.getElementById('searchInput');
                 const searchBtn = document.getElementById('searchBtn');
@@ -974,18 +1093,9 @@
                     // Show loading state immediately
                     this.showLoading();
                     
-                    // List of possible filenames to try
+                    // Generate possible filenames to try
                     const currentYear = new Date().getFullYear();
-                    const currentMonth = new Date().toLocaleString('default', { month: 'short' });
-                    
-                    const possibleFilenames = [
-                        'Results Nov 2025.csv',
-                        `Results ${currentMonth} ${currentYear}.csv`,
-                        'results.csv',
-                        'Results.csv',
-                        'diploma_results.csv',
-                        'student_results.csv'
-                    ];
+                    const possibleFilenames = this.generatePossibleFilenames(currentYear);
                     
                     let csvText = null;
                     let loadedFileName = '';
@@ -1015,53 +1125,96 @@
                     }
                     
                 } catch (error) {
-                    console.log('📁 No default CSV files found - waiting for user upload');
+                    console.log('📁 No default CSV files found');
                     this.hideLoading();
-                    // Show file upload area
-                    document.getElementById('fileUpload').style.display = 'block';
+                    // Show error message instead of file upload
+                    this.showNoFileMessage();
                 }
             }
 
-            handleDragOver(e) {
-                e.preventDefault();
-                e.currentTarget.classList.add('dragover');
-            }
-
-            handleDrop(e) {
-                e.preventDefault();
-                e.currentTarget.classList.remove('dragover');
+            generatePossibleFilenames(year) {
+                const months = [
+                    'January', 'February', 'March', 'April', 'May', 'June',
+                    'July', 'August', 'September', 'October', 'November', 'December'
+                ];
                 
-                const files = e.dataTransfer.files;
-                if (files.length > 0 && files[0].type === 'text/csv') {
-                    this.loadFile(files[0]);
-                }
-            }
-
-            handleFileSelect(e) {
-                const file = e.target.files[0];
-                if (file && file.type === 'text/csv') {
-                    this.loadFile(file);
-                }
-            }
-
-            async loadFile(file) {
-                this.showLoading();
+                const shortMonths = [
+                    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+                ];
                 
-                try {
-                    this.currentFileName = file.name;
-                    this.updateTitle(file.name);
-                    const text = await file.text();
-                    await this.processCSV(text);
-                } catch (error) {
-                    console.error('Error loading file:', error);
-                    alert('Error loading file. Please check the CSV format.');
-                    this.hideLoading();
+                const filenames = [];
+                
+                // Try current year and previous year
+                [year, year - 1].forEach(yr => {
+                    // Try both full month names and short month names
+                    [...months, ...shortMonths].forEach(month => {
+                        // Regular Results files
+                        filenames.push(`Results ${month} ${yr}.csv`);
+                        // Makeup Results files
+                        filenames.push(`Results Makeup ${month} ${yr}.csv`);
+                    });
+                });
+                
+                // Add some common variations
+                filenames.push(
+                    'Results Nov 2025.csv',
+                    'Results Makeup Nov 2025.csv',
+                    'results.csv',
+                    'Results.csv'
+                );
+                
+                return filenames;
+            }
+
+            showNoFileMessage() {
+                const container = document.querySelector('.container');
+                const existingMessage = document.getElementById('noFileMessage');
+                
+                if (!existingMessage) {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.id = 'noFileMessage';
+                    messageDiv.style.cssText = `
+                        text-align: center;
+                        padding: 3rem 1rem;
+                        background: var(--surface);
+                        border-radius: 1rem;
+                        margin: 2rem 0;
+                        box-shadow: var(--shadow);
+                    `;
+                    messageDiv.innerHTML = `
+                        <h3 style="color: var(--text-primary); margin-bottom: 1rem;">📁 No Results File Found</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                            Please ensure your CSV file is named in one of these formats:
+                        </p>
+                        <div style="color: var(--text-secondary); font-family: monospace; font-size: 0.9rem; line-height: 1.8;">
+                            <div>• Results [Month] [Year].csv</div>
+                            <div>• Results Makeup [Month] [Year].csv</div>
+                            <div style="margin-top: 0.5rem; font-style: italic;">Examples:</div>
+                            <div>• Results November 2025.csv</div>
+                            <div>• Results Makeup Nov 2025.csv</div>
+                        </div>
+                        <p style="color: var(--text-secondary); margin-top: 1rem; font-size: 0.9rem;">
+                            The file should be in the same directory as this HTML file.
+                        </p>
+                    `;
+                    
+                    // Insert after loading div
+                    const loading = document.getElementById('loading');
+                    loading.parentNode.insertBefore(messageDiv, loading.nextSibling);
                 }
             }
+
+
 
             updateTitle(filename) {
-                // Extract month and year from filename pattern: "Results {Month} {Year}.csv"
-                const match = filename.match(/Results\s+([A-Za-z]{3})\s+(\d{4})/i);
+                // Extract month and year from filename patterns:
+                // "Results {Month} {Year}.csv" or "Results Makeup {Month} {Year}.csv"
+                const regularMatch = filename.match(/Results\s+([A-Za-z]{3,})\s+(\d{4})/i);
+                const makeupMatch = filename.match(/Results\s+Makeup\s+([A-Za-z]{3,})\s+(\d{4})/i);
+                
+                let match = regularMatch || makeupMatch;
+                let isMarkup = !!makeupMatch;
                 
                 if (match) {
                     const month = match[1];
@@ -1076,7 +1229,8 @@
                     };
                     
                     const fullMonth = monthNames[month.toLowerCase()] || month;
-                    const title = `📊 Diploma Results - ${fullMonth} ${year}`;
+                    const examType = isMarkup ? 'Makeup Examination' : 'Examination';
+                    const title = `📊 Diploma Results - ${fullMonth} ${year} ${examType}`;
                     
                     document.getElementById('mainTitle').textContent = title;
                 } else {
@@ -1262,7 +1416,7 @@
                         ${students.length > 0 ? `
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; color: var(--text-secondary); font-size: 0.9rem;">
                                 <span>👥 ${students.length} students</span>
-                                <span>← Scroll horizontally to navigate →</span>
+                                <span class="scroll-hint">💡 Scroll horizontally within cards to see full results</span>
                             </div>
                         ` : ''}
                         <div class="students-scroll">
@@ -1278,58 +1432,107 @@
             }
 
             renderStudentCard(student) {
-                const resultClass = this.getResultClass(student.overallResult);
-                const subjectsTable = student.subjects.length > 0 ? this.renderSubjectsTable(student.subjects) : '<p class="text-center" style="color: var(--text-secondary);">No subject details available</p>';
+                // Calculate pass/fail counts
+                const passCount = student.subjects.filter(subject => subject.result === 'P').length;
+                const failCount = student.subjects.filter(subject => subject.result === 'F').length;
+                
+                // Determine overall status class
+                const overallStatus = this.getOverallStatus(student.overallResult);
+                const statusClass = this.getOverallStatusClass(student.overallResult);
+                
+                const subjectsTable = student.subjects.length > 0 ? this.renderSubjectsTableNew(student.subjects) : 
+                    '<div style="text-align: center; padding: 2rem; color: var(--text-secondary);">No subject details available</div>';
 
                 return `
                     <div class="student-card">
-                        <div class="student-header">
-                            <div class="student-info">
-                                <h4>${student.name}</h4>
-                                <p>Reg: ${student.regNo}</p>
-                                <p>Father: ${student.father}</p>
+                        <div class="student-card-inner">
+                            <div class="student-header">
+                                <div class="student-info">
+                                    <div class="student-name">${student.name}</div>
+                                    <div class="student-details">
+                                        <div>Reg No: ${student.regNo} | Father: ${student.father}</div>
+                                    </div>
+                                </div>
+                                <div class="student-badges">
+                                    <span class="badge badge-passed">Passed: ${passCount}</span>
+                                    <span class="badge badge-failed">Failed: ${failCount}</span>
+                                    <span class="badge badge-status ${statusClass}">${overallStatus}</span>
+                                </div>
                             </div>
-                            <span class="result-badge ${resultClass}">${student.overallResult}</span>
-                        </div>
-                        <div class="overflow-x-auto">
-                            ${subjectsTable}
+                            <div class="subjects-table-container">
+                                ${subjectsTable}
+                            </div>
                         </div>
                     </div>
                 `;
             }
 
-            renderSubjectsTable(subjects) {
+            renderSubjectsTableNew(subjects) {
                 if (subjects.length === 0) return '';
 
                 return `
                     <table class="subjects-table">
                         <thead>
                             <tr>
-                                <th>Sem</th>
-                                <th>Subject</th>
-                                <th>IA</th>
-                                <th>Theory</th>
-                                <th>Practical</th>
-                                <th>Grade</th>
-                                <th>Credits</th>
+                                <th class="col-sem">Sem</th>
+                                <th class="col-qp">QP Code</th>
+                                <th class="col-subject">Subject</th>
+                                <th class="col-ia">IA</th>
+                                <th class="col-theory">Theory</th>
+                                <th class="col-practical">Practical</th>
+                                <th class="col-result">Result</th>
+                                <th class="col-credit">Credit</th>
+                                <th class="col-grade">Grade</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${subjects.map(subject => `
                                 <tr>
-                                    <td>${subject.semester || '-'}</td>
-                                    <td style="max-width: 200px; word-wrap: break-word;">${subject.subject || '-'}</td>
-                                    <td>${subject.ia || '-'}</td>
-                                    <td>${subject.theory || '-'}</td>
-                                    <td>${subject.practical || '-'}</td>
-                                    <td><span class="grade ${subject.result === 'P' ? 'pass' : 'fail'}">${subject.grade || '-'}</span></td>
-                                    <td>${subject.credit || '-'}</td>
+                                    <td class="col-sem">${subject.semester || '-'}</td>
+                                    <td class="col-qp">${this.cleanQPCode(subject.qpCode) || '-'}</td>
+                                    <td class="col-subject" title="${subject.subject || ''}">${subject.subject || '-'}</td>
+                                    <td class="col-ia">${subject.ia || '-'}</td>
+                                    <td class="col-theory">${subject.theory || '-'}</td>
+                                    <td class="col-practical">${subject.practical === '--' ? '--' : (subject.practical || '-')}</td>
+                                    <td class="col-result"><span class="result-${subject.result === 'P' ? 'p' : 'f'}">${subject.result || '-'}</span></td>
+                                    <td class="col-credit">${subject.credit || '-'}</td>
+                                    <td class="col-grade"><span class="grade-${subject.result === 'P' ? 'pass' : 'f'}">${subject.grade || '-'}</span></td>
                                 </tr>
                             `).join('')}
                         </tbody>
                     </table>
                 `;
             }
+
+            cleanQPCode(qpCode) {
+                if (!qpCode) return '';
+                // Remove trailing colon if present
+                return qpCode.toString().replace(/:$/, '');
+            }
+
+            getOverallStatus(result) {
+                const statusMap = {
+                    'Distinction': 'DISTINCTION',
+                    'First Class': 'FIRST CLASS',
+                    'Second Class': 'SECOND CLASS',
+                    'FAILS': 'FAILS',
+                    '# Distinction': 'DISTINCTION',
+                    '# Second Class': 'SECOND CLASS'
+                };
+                return statusMap[result] || 'UNKNOWN';
+            }
+
+            getOverallStatusClass(result) {
+                if (['Distinction', '# Distinction', 'First Class', 'Second Class', '# Second Class'].includes(result)) {
+                    return 'pass';
+                } else if (result === 'FAILS') {
+                    return 'fail';
+                } else {
+                    return 'unknown';
+                }
+            }
+
+
 
             performSearch() {
                 const query = document.getElementById('searchInput').value.trim();
@@ -1363,7 +1566,7 @@
                             <p><strong>${results.length}</strong> result(s) found for "${query}"</p>
                         </div>
                         <div class="students-container">
-                            <div class="students-scroll" style="max-height: 60vh;">
+                            <div class="students-scroll" style="max-height: 60vh; overflow-y: auto;">
                                 <div class="students-grid">
                                     ${results.map(student => this.renderStudentCard(student)).join('')}
                                 </div>
@@ -1412,17 +1615,7 @@
                 return courseNames[code] || code;
             }
 
-            getResultClass(result) {
-                const resultClasses = {
-                    'Distinction': 'distinction',
-                    'First Class': 'first-class',
-                    'Second Class': 'second-class',
-                    'FAILS': 'fails',
-                    '# Distinction': 'distinction',
-                    '# Second Class': 'second-class'
-                };
-                return resultClasses[result] || 'unknown';
-            }
+
 
             toggleTheme() {
                 const currentTheme = document.documentElement.getAttribute('data-theme');
@@ -1470,7 +1663,6 @@
 
             hideLoading() {
                 document.getElementById('loading').style.display = 'none';
-                document.getElementById('fileUpload').style.display = 'block';
             }
 
             showResults() {

@@ -104,7 +104,7 @@
 
         .search-input {
             padding: 0.5rem 1rem;
-            border: 1px solid var(--border);
+            border: 2px solid var(--border);
             border-radius: 0.5rem;
             background: var(--surface);
             color: var(--text-primary);
@@ -112,12 +112,22 @@
             width: 200px;
             transition: all 0.3s ease;
             text-transform: uppercase;
+            animation: borderGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes borderGlow {
+            0% { border-color: var(--primary-color); box-shadow: 0 0 5px rgba(37, 99, 235, 0.3); }
+            25% { border-color: #10b981; box-shadow: 0 0 5px rgba(16, 185, 129, 0.3); }
+            50% { border-color: #f59e0b; box-shadow: 0 0 5px rgba(245, 158, 11, 0.3); }
+            75% { border-color: #ef4444; box-shadow: 0 0 5px rgba(239, 68, 68, 0.3); }
+            100% { border-color: var(--primary-color); box-shadow: 0 0 5px rgba(37, 99, 235, 0.3); }
         }
 
         .search-input:focus {
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            animation: none;
         }
 
         .btn {
@@ -159,23 +169,78 @@
             border-radius: 1rem;
             box-shadow: var(--shadow);
             margin-top: 2rem;
+            position: relative;
+        }
+
+        .tab-headers-container {
+            position: relative;
         }
 
         .tab-headers {
             display: flex;
-            background: var(--surface-elevated);
-            overflow-x: auto;
-            scrollbar-width: none;
-            position: sticky;
-            top: calc(var(--header-height) + 20px);
-            z-index: 90;
-            border-bottom: 1px solid var(--border);
+            background: var(--glass-bg);
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            overflow-x: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
+            position: relative;
+            z-index: 95;
+            border-bottom: 1px solid var(--glass-border);
             border-radius: 1rem 1rem 0 0;
+            padding: 0 0.5rem;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 0;
+            transition: all 0.3s ease;
+        }
+
+        .tab-headers.sticky {
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            right: 0;
+            z-index: 98;
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border-bottom: 2px solid var(--primary-color);
         }
 
         .tab-headers::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .tab-headers::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .tab-headers::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 2px;
+        }
+
+        .tab-headers::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        .scroll-indicator {
             display: none;
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(90deg, transparent, var(--glass-bg));
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            pointer-events: none;
+            z-index: 96;
+            backdrop-filter: blur(5px);
         }
 
         .tab-header {
@@ -185,21 +250,97 @@
             border-bottom: 3px solid transparent;
             white-space: nowrap;
             font-weight: 500;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+            min-width: fit-content;
+        }
+
+        .tab-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--tab-color, var(--primary-color)), var(--tab-color-light, rgba(37, 99, 235, 0.6)));
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .tab-header:hover::before {
+            transform: translateX(0);
         }
 
         .tab-header:hover {
-            background: var(--background);
+            background: var(--tab-color-bg, var(--background));
+            color: var(--tab-color, var(--primary-color));
         }
 
         .tab-header.active {
-            border-bottom-color: var(--primary-color);
-            color: var(--primary-color);
-            background: var(--background);
+            border-bottom-color: var(--tab-color, var(--primary-color));
+            color: var(--tab-color, var(--primary-color));
+            background: var(--tab-color-bg, var(--background));
+        }
+
+        .tab-header.active::before {
+            transform: translateX(0);
+        }
+
+        /* Course-specific colors */
+        .tab-header.course-ce {
+            --tab-color: #dc2626;
+            --tab-color-light: rgba(220, 38, 38, 0.6);
+            --tab-color-bg: rgba(220, 38, 38, 0.05);
+        }
+
+        .tab-header.course-cs {
+            --tab-color: #2563eb;
+            --tab-color-light: rgba(37, 99, 235, 0.6);
+            --tab-color-bg: rgba(37, 99, 235, 0.05);
+        }
+
+        .tab-header.course-ee {
+            --tab-color: #f59e0b;
+            --tab-color-light: rgba(245, 158, 11, 0.6);
+            --tab-color-bg: rgba(245, 158, 11, 0.05);
+        }
+
+        .tab-header.course-me {
+            --tab-color: #10b981;
+            --tab-color-light: rgba(16, 185, 129, 0.6);
+            --tab-color-bg: rgba(16, 185, 129, 0.05);
+        }
+
+        .tab-header.course-ec {
+            --tab-color: #8b5cf6;
+            --tab-color-light: rgba(139, 92, 246, 0.6);
+            --tab-color-bg: rgba(139, 92, 246, 0.05);
+        }
+
+        .tab-header.course-default {
+            --tab-color: #6b7280;
+            --tab-color-light: rgba(107, 114, 128, 0.6);
+            --tab-color-bg: rgba(107, 114, 128, 0.05);
         }
 
         .tab-content {
             padding: 2rem;
             min-height: 400px;
+            position: relative;
+        }
+
+        /* Add a subtle indicator that tabs are sticky */
+        .tab-headers::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-color), var(--success-color), var(--warning-color), var(--danger-color));
+            opacity: 0.6;
+            z-index: 1;
         }
 
         /* Students Container - Vertical Layout */
@@ -263,27 +404,32 @@
             width: 100%;
         }
 
+        /* FIXED: Student Header - Exactly 2 Rows Layout */
         .student-header {
             padding: 1rem 1.5rem;
             background: var(--surface);
             border-bottom: 1px solid var(--border);
+            min-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        /* Row 1: Name, Reg No, Result Badge */
+        .student-header-row1 {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            min-width: 600px;
+            align-items: center;
             gap: 1rem;
+            min-height: 1.5rem;
         }
 
-        .student-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .student-name-row {
+        .student-name-reg {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 0.25rem;
+            gap: 1rem;
+            flex: 1;
+            min-width: 0;
         }
 
         .student-name {
@@ -293,10 +439,19 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            flex-shrink: 1;
+        }
+
+        .student-reg-no {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .student-result-badge {
-            padding: 0.25rem 0.5rem;
+            padding: 0.25rem 0.6rem;
             border-radius: 0.25rem;
             font-size: 0.7rem;
             font-weight: bold;
@@ -321,38 +476,30 @@
             color: white;
         }
 
-        .student-details {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            line-height: 1.4;
+        /* Row 2: Father Name, Pass/Fail Counts */
+        .student-header-row2 {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            min-height: 1.5rem;
         }
 
-        .student-details div {
+        .student-father {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-        }
-
-        .student-badges {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-            align-items: flex-end;
-            flex-shrink: 0;
+            flex: 1;
+            min-width: 0;
         }
 
         .sem-counts {
             display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-            font-size: 0.75rem;
-        }
-
-        .sem-row {
-            display: flex;
             gap: 0.5rem;
-            flex-wrap: wrap;
-            justify-content: flex-end;
+            align-items: center;
+            flex-shrink: 0;
         }
 
         .sem-count {
@@ -593,7 +740,7 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Responsive Design - Mobile First */
+        /* Mobile Responsive Design - FIXED for 2-row layout */
         @media (max-width: 768px) {
             :root {
                 --header-height: auto;
@@ -650,19 +797,58 @@
             }
 
             .tab-headers {
-                position: sticky;
+                position: relative;
+                margin-top: 0;
+                padding: 0 0.25rem;
+                gap: 0.25rem;
+                scrollbar-width: auto;
+                box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+            }
+
+            .tab-headers.sticky {
+                position: fixed;
                 top: 120px;
-                z-index: 90;
-                margin-top: 1rem;
+                z-index: 98;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            }
+
+            .tab-headers::-webkit-scrollbar {
+                height: 3px;
+            }
+
+            .scroll-indicator {
+                display: block;
+                font-size: 1rem;
+                padding: 0.25rem 0.5rem;
+                animation: scrollHint 2s ease-in-out infinite;
+            }
+
+            @keyframes scrollHint {
+                0%, 100% { opacity: 0.6; transform: translateY(-50%) translateX(0); }
+                50% { opacity: 1; transform: translateY(-50%) translateX(-3px); }
             }
 
             .tab-header {
-                padding: 0.75rem 1rem;
+                padding: 0.875rem 1.25rem;
                 font-size: 0.9rem;
-                min-height: 44px;
+                min-height: 48px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                border-radius: 0.5rem;
+                margin: 0.25rem 0;
+                min-width: 120px;
+                text-align: center;
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .tab-header:first-child {
+                margin-left: 0.5rem;
+            }
+
+            .tab-header:last-child {
+                margin-right: 0.5rem;
             }
 
             .tab-content {
@@ -677,38 +863,30 @@
                 min-width: 320px;
             }
 
-            .student-header {
-                padding: 0.75rem 1rem;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.5rem;
+            .student-card-inner {
                 min-width: 320px;
             }
 
-            .student-name-row {
+            /* FIXED: Mobile Student Header - Still 2 rows, but responsive */
+            .student-header {
+                padding: 0.75rem 1rem;
+                min-width: 320px;
+                gap: 0.5rem;
+            }
+
+            /* Mobile Row 1: Stack name and reg number if needed */
+            .student-name-reg {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 0.5rem;
-                width: 100%;
-            }
-
-            .student-badges {
-                width: 100%;
-                align-items: flex-start;
-            }
-
-            .sem-counts {
-                width: 100%;
-            }
-
-            .sem-row {
-                justify-content: flex-start;
                 gap: 0.25rem;
             }
 
-            .sem-count {
-                font-size: 0.65rem;
-                padding: 0.15rem 0.4rem;
+            .student-name {
+                font-size: 1.1rem;
+            }
+
+            .student-reg-no {
+                font-size: 1rem;
             }
 
             .student-result-badge {
@@ -716,12 +894,19 @@
                 padding: 0.2rem 0.4rem;
             }
 
-            .student-name {
-                font-size: 1.1rem;
+            /* Mobile Row 2: Father name and counts in compact form */
+            .student-father {
+                font-size: 0.85rem;
             }
 
-            .student-details {
-                font-size: 0.85rem;
+            .sem-counts {
+                gap: 0.25rem;
+                flex-wrap: wrap;
+            }
+
+            .sem-count {
+                font-size: 0.65rem;
+                padding: 0.15rem 0.4rem;
             }
 
             .subjects-table th,
@@ -759,6 +944,7 @@
             }
         }
 
+        /* Extra small screens */
         @media (max-width: 480px) {
             .container {
                 padding: 0 0.5rem;
@@ -787,6 +973,10 @@
                 min-width: 300px;
             }
 
+            .student-card-inner {
+                min-width: 300px;
+            }
+
             .student-header {
                 padding: 0.75rem;
                 min-width: 300px;
@@ -796,7 +986,11 @@
                 font-size: 1rem;
             }
 
-            .student-details {
+            .student-reg-no {
+                font-size: 0.95rem;
+            }
+
+            .student-father {
                 font-size: 0.8rem;
             }
 
@@ -887,8 +1081,8 @@
                     <div class="search-container">
                         <input type="text" class="search-input" id="searchInput" 
                                placeholder="Search by Reg No or Name..." maxlength="50">
-                        <button class="btn btn-outline" id="clearSearch" title="Clear search">✕</button>
                         <button class="btn btn-primary" id="searchBtn">🔍</button>
+                        <button class="btn btn-outline" id="clearSearch" title="Clear search">✕</button>
                     </div>
                     <button class="btn btn-outline theme-toggle-mobile" id="themeToggle">🌙</button>
                 </div>
@@ -947,8 +1141,11 @@
 
         <!-- Course Tabs -->
         <section class="course-section" id="courseTabs" style="display: none;">
-            <div class="tab-headers" id="tabHeaders">
-                <!-- Dynamic tabs will be inserted here -->
+            <div class="tab-headers-container">
+                <div class="tab-headers" id="tabHeaders">
+                    <!-- Dynamic tabs will be inserted here -->
+                </div>
+                <div class="scroll-indicator" id="scrollIndicator">→</div>
             </div>
             <div class="tab-content" id="tabContent">
                 <!-- Dynamic content will be inserted here -->
@@ -991,6 +1188,11 @@
                 this.loadTheme();
                 this.calculateHeaderHeight();
                 this.tryLoadDefaultFile();
+                
+                // Recalculate header height after DOM is fully loaded
+                setTimeout(() => {
+                    this.calculateHeaderHeight();
+                }, 100);
             }
 
             calculateHeaderHeight() {
@@ -998,6 +1200,7 @@
                 const header = document.querySelector('.header');
                 if (header) {
                     this.headerHeight = header.offsetHeight;
+                    document.documentElement.style.setProperty('--header-height', `${this.headerHeight}px`);
                     document.documentElement.style.setProperty('--calculated-header-height', `${this.headerHeight}px`);
                 }
             }
@@ -1032,10 +1235,144 @@
                     if (e.target.id === 'searchModal') this.closeModal();
                 });
 
+                // Tab scroll indicator
+                this.setupTabScrollIndicator();
+
                 // Recalculate header height on resize
                 window.addEventListener('resize', () => {
                     this.calculateHeaderHeight();
+                    this.updateScrollIndicator();
                 });
+            }
+
+            setupStickyTabsEnhancement() {
+                const tabHeaders = document.getElementById('tabHeaders');
+                const tabHeadersContainer = document.querySelector('.tab-headers-container');
+                
+                if (!tabHeaders || !tabHeadersContainer) return;
+                
+                let stickyPlaceholder = null;
+                let isSticky = false;
+                let originalTop = 0;
+                
+                // Create placeholder element
+                const createPlaceholder = () => {
+                    if (!stickyPlaceholder) {
+                        stickyPlaceholder = document.createElement('div');
+                        stickyPlaceholder.style.height = tabHeaders.offsetHeight + 'px';
+                        stickyPlaceholder.style.display = 'none';
+                        tabHeadersContainer.appendChild(stickyPlaceholder);
+                    }
+                };
+                
+                // Calculate positions
+                const updatePositions = () => {
+                    if (!isSticky) {
+                        const rect = tabHeaders.getBoundingClientRect();
+                        originalTop = window.pageYOffset + rect.top;
+                    }
+                };
+                
+                // Handle sticky behavior
+                const handleSticky = () => {
+                    const headerHeight = this.headerHeight || (window.innerWidth <= 768 ? (window.innerWidth <= 480 ? 140 : 120) : 80);
+                    const scrollTop = window.pageYOffset;
+                    const shouldBeSticky = scrollTop > (originalTop - headerHeight);
+                    
+                    if (shouldBeSticky && !isSticky) {
+                        // Make sticky
+                        isSticky = true;
+                        createPlaceholder();
+                        stickyPlaceholder.style.display = 'block';
+                        stickyPlaceholder.style.height = tabHeaders.offsetHeight + 'px';
+                        tabHeaders.classList.add('sticky');
+                        
+                        // Apply responsive top positioning
+                        if (window.innerWidth <= 480) {
+                            tabHeaders.style.top = '140px';
+                        } else if (window.innerWidth <= 768) {
+                            tabHeaders.style.top = '120px';
+                        } else {
+                            tabHeaders.style.top = headerHeight + 'px';
+                        }
+                        
+                    } else if (!shouldBeSticky && isSticky) {
+                        // Remove sticky
+                        isSticky = false;
+                        if (stickyPlaceholder) {
+                            stickyPlaceholder.style.display = 'none';
+                        }
+                        tabHeaders.classList.remove('sticky');
+                        tabHeaders.style.top = '';
+                    }
+                };
+                
+                // Initialize
+                updatePositions();
+                createPlaceholder();
+                
+                // Event listeners
+                window.addEventListener('scroll', handleSticky, { passive: true });
+                window.addEventListener('resize', () => {
+                    setTimeout(() => {
+                        if (!isSticky) {
+                            updatePositions();
+                        }
+                        if (stickyPlaceholder && isSticky) {
+                            stickyPlaceholder.style.height = tabHeaders.offsetHeight + 'px';
+                        }
+                    }, 100);
+                });
+                
+                // Store reference for cleanup
+                this.stickyCleanup = () => {
+                    window.removeEventListener('scroll', handleSticky);
+                    if (stickyPlaceholder && stickyPlaceholder.parentNode) {
+                        stickyPlaceholder.parentNode.removeChild(stickyPlaceholder);
+                    }
+                };
+            }
+
+            setupTabScrollIndicator() {
+                const tabHeaders = document.getElementById('tabHeaders');
+                const scrollIndicator = document.getElementById('scrollIndicator');
+                
+                if (tabHeaders && scrollIndicator) {
+                    // Hide indicator when user scrolls
+                    tabHeaders.addEventListener('scroll', () => {
+                        scrollIndicator.style.opacity = '0';
+                        setTimeout(() => {
+                            scrollIndicator.style.display = 'none';
+                        }, 300);
+                    });
+
+                    // Update indicator visibility on content change
+                    const observer = new MutationObserver(() => {
+                        this.updateScrollIndicator();
+                    });
+
+                    observer.observe(tabHeaders, {
+                        childList: true,
+                        subtree: true
+                    });
+                }
+            }
+
+            updateScrollIndicator() {
+                const tabHeaders = document.getElementById('tabHeaders');
+                const scrollIndicator = document.getElementById('scrollIndicator');
+                
+                if (tabHeaders && scrollIndicator) {
+                    const canScroll = tabHeaders.scrollWidth > tabHeaders.clientWidth;
+                    const isScrolled = tabHeaders.scrollLeft > 0;
+                    
+                    if (canScroll && !isScrolled && window.innerWidth <= 768) {
+                        scrollIndicator.style.display = 'block';
+                        scrollIndicator.style.opacity = '0.6';
+                    } else {
+                        scrollIndicator.style.display = 'none';
+                    }
+                }
             }
 
             async tryLoadDefaultFile() {
@@ -1259,7 +1596,8 @@
                 let isFirst = true;
                 for (const [courseCode, students] of this.courses) {
                     const tab = document.createElement('div');
-                    tab.className = `tab-header ${isFirst ? 'active' : ''}`;
+                    const courseClass = this.getCourseClass(courseCode);
+                    tab.className = `tab-header ${courseClass} ${isFirst ? 'active' : ''}`;
                     tab.textContent = `${this.getCourseName(courseCode)} (${students.length})`;
                     tab.addEventListener('click', () => this.switchTab(courseCode, tab));
                     tabHeaders.appendChild(tab);
@@ -1269,6 +1607,28 @@
                         isFirst = false;
                     }
                 }
+
+                // Update scroll indicator and setup sticky behavior after rendering tabs
+                setTimeout(() => {
+                    this.updateScrollIndicator();
+                    // Cleanup previous sticky setup
+                    if (this.stickyCleanup) {
+                        this.stickyCleanup();
+                    }
+                    // Setup new sticky behavior
+                    this.setupStickyTabsEnhancement();
+                }, 100);
+            }
+
+            getCourseClass(courseCode) {
+                const courseClasses = {
+                    'CE': 'course-ce',
+                    'CS': 'course-cs', 
+                    'EE': 'course-ee',
+                    'ME': 'course-me',
+                    'EC': 'course-ec'
+                };
+                return courseClasses[courseCode] || 'course-default';
             }
 
             switchTab(courseCode, tabElement) {
@@ -1327,16 +1687,23 @@
                     return parseInt(a) - parseInt(b);
                 });
                 
-                // Generate passed counts row
-                const passedRow = sortedSemesters
-                    .filter(sem => semesterStats[sem].passed > 0)
-                    .map(sem => `<span class="sem-count passed">Sem ${sem}: ${semesterStats[sem].passed}P</span>`)
-                    .join('');
-                
-                // Generate failed counts row
-                const failedRow = sortedSemesters
-                    .filter(sem => semesterStats[sem].failed > 0)
-                    .map(sem => `<span class="sem-count failed">Sem ${sem}: ${semesterStats[sem].failed}F</span>`)
+                // Generate compact semester counts (passed and failed combined)
+                const semCounts = sortedSemesters
+                    .map(sem => {
+                        const stats = semesterStats[sem];
+                        const passCount = stats.passed > 0 ? `${stats.passed}P` : '';
+                        const failCount = stats.failed > 0 ? `${stats.failed}F` : '';
+                        
+                        if (passCount && failCount) {
+                            return `<span class="sem-count passed">S${sem}: ${passCount}</span><span class="sem-count failed">S${sem}: ${failCount}</span>`;
+                        } else if (passCount) {
+                            return `<span class="sem-count passed">S${sem}: ${passCount}</span>`;
+                        } else if (failCount) {
+                            return `<span class="sem-count failed">S${sem}: ${failCount}</span>`;
+                        }
+                        return '';
+                    })
+                    .filter(Boolean)
                     .join('');
                 
                 // Determine overall status class
@@ -1350,19 +1717,17 @@
                     <div class="student-card">
                         <div class="student-card-inner">
                             <div class="student-header">
-                                <div class="student-info">
-                                    <div class="student-name-row">
+                                <div class="student-header-row1">
+                                    <div class="student-name-reg">
                                         <div class="student-name">${student.name}</div>
-                                        <span class="student-result-badge ${statusClass}">${overallStatus}</span>
+                                        <div class="student-reg-no">${student.regNo}</div>
                                     </div>
-                                    <div class="student-details">
-                                        <div>Reg No: ${student.regNo} | Father: ${student.father}</div>
-                                    </div>
+                                    <span class="student-result-badge ${statusClass}">${overallStatus}</span>
                                 </div>
-                                <div class="student-badges">
+                                <div class="student-header-row2">
+                                    <div class="student-father">Father: ${student.father}</div>
                                     <div class="sem-counts">
-                                        ${passedRow ? `<div class="sem-row">${passedRow}</div>` : ''}
-                                        ${failedRow ? `<div class="sem-row">${failedRow}</div>` : ''}
+                                        ${semCounts}
                                     </div>
                                 </div>
                             </div>

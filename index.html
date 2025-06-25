@@ -169,7 +169,6 @@
             border-radius: 1rem;
             box-shadow: var(--shadow);
             margin-top: 2rem;
-            position: relative;
         }
 
         .tab-headers-container {
@@ -178,36 +177,19 @@
 
         .tab-headers {
             display: flex;
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: var(--surface-elevated);
             overflow-x: auto;
             scrollbar-width: thin;
             scrollbar-color: var(--border) transparent;
-            position: relative;
-            z-index: 95;
-            border-bottom: 1px solid var(--glass-border);
+            position: sticky;
+            top: calc(var(--header-height) + 20px);
+            z-index: 90;
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(10px);
             border-radius: 1rem 1rem 0 0;
             padding: 0 0.5rem;
             scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            margin-top: 0;
-            transition: all 0.3s ease;
-        }
-
-        .tab-headers.sticky {
-            position: fixed;
-            top: var(--header-height);
-            left: 0;
-            right: 0;
-            z-index: 98;
-            background: var(--glass-bg);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border-radius: 0;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-            border-bottom: 2px solid var(--primary-color);
         }
 
         .tab-headers::-webkit-scrollbar {
@@ -230,17 +212,16 @@
         .scroll-indicator {
             display: none;
             position: absolute;
-            right: 0.5rem;
+            right: 0;
             top: 50%;
             transform: translateY(-50%);
-            background: linear-gradient(90deg, transparent, var(--glass-bg));
+            background: linear-gradient(90deg, transparent, var(--surface-elevated));
             padding: 0.5rem;
-            border-radius: 0.25rem;
+            border-radius: 0 1rem 0 0;
             font-size: 1.2rem;
             color: var(--text-secondary);
             pointer-events: none;
-            z-index: 96;
-            backdrop-filter: blur(5px);
+            z-index: 95;
         }
 
         .tab-header {
@@ -327,25 +308,6 @@
         .tab-content {
             padding: 2rem;
             min-height: 400px;
-            position: relative;
-            transition: padding-top 0.3s ease;
-        }
-
-        .tab-content.sticky-active {
-            padding-top: 6rem;
-        }
-
-        /* Add a subtle indicator that tabs are sticky */
-        .tab-headers::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, var(--primary-color), var(--success-color), var(--warning-color), var(--danger-color));
-            opacity: 0.6;
-            z-index: 1;
         }
 
         /* Students Container - Vertical Layout */
@@ -802,19 +764,13 @@
             }
 
             .tab-headers {
-                position: relative;
-                margin-top: 0;
+                position: sticky;
+                top: 120px;
+                z-index: 90;
+                margin-top: 1rem;
                 padding: 0 0.25rem;
                 gap: 0.25rem;
                 scrollbar-width: auto;
-                box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
-            }
-
-            .tab-headers.sticky {
-                position: fixed;
-                top: 120px;
-                z-index: 98;
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
             }
 
             .tab-headers::-webkit-scrollbar {
@@ -858,10 +814,6 @@
 
             .tab-content {
                 padding: 1rem 0.75rem;
-            }
-
-            .tab-content.sticky-active {
-                padding-top: 5rem;
             }
 
             .students-grid {
@@ -1197,11 +1149,6 @@
                 this.loadTheme();
                 this.calculateHeaderHeight();
                 this.tryLoadDefaultFile();
-                
-                // Recalculate header height after DOM is fully loaded
-                setTimeout(() => {
-                    this.calculateHeaderHeight();
-                }, 100);
             }
 
             calculateHeaderHeight() {
@@ -1209,7 +1156,6 @@
                 const header = document.querySelector('.header');
                 if (header) {
                     this.headerHeight = header.offsetHeight;
-                    document.documentElement.style.setProperty('--header-height', `${this.headerHeight}px`);
                     document.documentElement.style.setProperty('--calculated-header-height', `${this.headerHeight}px`);
                 }
             }
@@ -1252,100 +1198,6 @@
                     this.calculateHeaderHeight();
                     this.updateScrollIndicator();
                 });
-            }
-
-            setupStickyTabsEnhancement() {
-                const tabHeaders = document.getElementById('tabHeaders');
-                const tabHeadersContainer = document.querySelector('.tab-headers-container');
-                const tabContent = document.getElementById('tabContent');
-                
-                if (!tabHeaders || !tabHeadersContainer || !tabContent) return;
-                
-                let stickyPlaceholder = null;
-                let isSticky = false;
-                let originalTop = 0;
-                
-                // Create placeholder element
-                const createPlaceholder = () => {
-                    if (!stickyPlaceholder) {
-                        stickyPlaceholder = document.createElement('div');
-                        stickyPlaceholder.style.height = tabHeaders.offsetHeight + 'px';
-                        stickyPlaceholder.style.display = 'none';
-                        tabHeadersContainer.appendChild(stickyPlaceholder);
-                    }
-                };
-                
-                // Calculate positions
-                const updatePositions = () => {
-                    if (!isSticky) {
-                        const rect = tabHeaders.getBoundingClientRect();
-                        originalTop = window.pageYOffset + rect.top;
-                    }
-                };
-                
-                // Handle sticky behavior
-                const handleSticky = () => {
-                    const headerHeight = this.headerHeight || (window.innerWidth <= 768 ? (window.innerWidth <= 480 ? 140 : 120) : 80);
-                    const scrollTop = window.pageYOffset;
-                    const shouldBeSticky = scrollTop > (originalTop - headerHeight);
-                    
-                    if (shouldBeSticky && !isSticky) {
-                        // Make sticky
-                        isSticky = true;
-                        createPlaceholder();
-                        stickyPlaceholder.style.display = 'block';
-                        stickyPlaceholder.style.height = tabHeaders.offsetHeight + 'px';
-                        tabHeaders.classList.add('sticky');
-                        tabContent.classList.add('sticky-active');
-                        
-                        // Apply responsive top positioning
-                        if (window.innerWidth <= 480) {
-                            tabHeaders.style.top = '130px';
-                        } else if (window.innerWidth <= 768) {
-                            tabHeaders.style.top = '110px';
-                        } else {
-                            tabHeaders.style.top = headerHeight + 'px';
-                        }
-                        
-                    } else if (!shouldBeSticky && isSticky) {
-                        // Remove sticky
-                        isSticky = false;
-                        if (stickyPlaceholder) {
-                            stickyPlaceholder.style.display = 'none';
-                        }
-                        tabHeaders.classList.remove('sticky');
-                        tabContent.classList.remove('sticky-active');
-                        tabHeaders.style.top = '';
-                    }
-                };
-                
-                // Initialize
-                updatePositions();
-                createPlaceholder();
-                
-                // Event listeners
-                window.addEventListener('scroll', handleSticky, { passive: true });
-                window.addEventListener('resize', () => {
-                    setTimeout(() => {
-                        if (!isSticky) {
-                            updatePositions();
-                        }
-                        if (stickyPlaceholder && isSticky) {
-                            stickyPlaceholder.style.height = tabHeaders.offsetHeight + 'px';
-                        }
-                    }, 100);
-                });
-                
-                // Store reference for cleanup
-                this.stickyCleanup = () => {
-                    window.removeEventListener('scroll', handleSticky);
-                    if (stickyPlaceholder && stickyPlaceholder.parentNode) {
-                        stickyPlaceholder.parentNode.removeChild(stickyPlaceholder);
-                    }
-                    // Remove sticky classes on cleanup
-                    tabHeaders.classList.remove('sticky');
-                    tabContent.classList.remove('sticky-active');
-                };
             }
 
             setupTabScrollIndicator() {
@@ -1623,16 +1475,8 @@
                     }
                 }
 
-                // Update scroll indicator and setup sticky behavior after rendering tabs
-                setTimeout(() => {
-                    this.updateScrollIndicator();
-                    // Cleanup previous sticky setup
-                    if (this.stickyCleanup) {
-                        this.stickyCleanup();
-                    }
-                    // Setup new sticky behavior
-                    this.setupStickyTabsEnhancement();
-                }, 100);
+                // Update scroll indicator after rendering tabs
+                setTimeout(() => this.updateScrollIndicator(), 100);
             }
 
             getCourseClass(courseCode) {

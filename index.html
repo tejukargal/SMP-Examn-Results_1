@@ -328,6 +328,11 @@
             padding: 2rem;
             min-height: 400px;
             position: relative;
+            transition: padding-top 0.3s ease;
+        }
+
+        .tab-content.sticky-active {
+            padding-top: 6rem;
         }
 
         /* Add a subtle indicator that tabs are sticky */
@@ -855,6 +860,10 @@
                 padding: 1rem 0.75rem;
             }
 
+            .tab-content.sticky-active {
+                padding-top: 5rem;
+            }
+
             .students-grid {
                 gap: 1rem;
             }
@@ -1248,8 +1257,9 @@
             setupStickyTabsEnhancement() {
                 const tabHeaders = document.getElementById('tabHeaders');
                 const tabHeadersContainer = document.querySelector('.tab-headers-container');
+                const tabContent = document.getElementById('tabContent');
                 
-                if (!tabHeaders || !tabHeadersContainer) return;
+                if (!tabHeaders || !tabHeadersContainer || !tabContent) return;
                 
                 let stickyPlaceholder = null;
                 let isSticky = false;
@@ -1286,12 +1296,13 @@
                         stickyPlaceholder.style.display = 'block';
                         stickyPlaceholder.style.height = tabHeaders.offsetHeight + 'px';
                         tabHeaders.classList.add('sticky');
+                        tabContent.classList.add('sticky-active');
                         
                         // Apply responsive top positioning
                         if (window.innerWidth <= 480) {
-                            tabHeaders.style.top = '140px';
+                            tabHeaders.style.top = '130px';
                         } else if (window.innerWidth <= 768) {
-                            tabHeaders.style.top = '120px';
+                            tabHeaders.style.top = '110px';
                         } else {
                             tabHeaders.style.top = headerHeight + 'px';
                         }
@@ -1303,6 +1314,7 @@
                             stickyPlaceholder.style.display = 'none';
                         }
                         tabHeaders.classList.remove('sticky');
+                        tabContent.classList.remove('sticky-active');
                         tabHeaders.style.top = '';
                     }
                 };
@@ -1330,6 +1342,9 @@
                     if (stickyPlaceholder && stickyPlaceholder.parentNode) {
                         stickyPlaceholder.parentNode.removeChild(stickyPlaceholder);
                     }
+                    // Remove sticky classes on cleanup
+                    tabHeaders.classList.remove('sticky');
+                    tabContent.classList.remove('sticky-active');
                 };
             }
 
